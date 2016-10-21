@@ -1,8 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include "bird.h"
+#include "background.h"
 
-const int RESOLUTION_W = 480;
-const int RESOLUTION_H = 640;
+static const int RESOLUTION_W = 480;
+static const int RESOLUTION_H = 640;
+
+static const sf::Color SKY_COLOR = sf::Color(0, 153, 204);
 
 void handleEvents(sf::RenderWindow &window)
 {
@@ -22,9 +25,10 @@ void update(sf::Clock &clock)
 	clock.restart();
 }
 
-void render(sf::RenderWindow &window, const Bird &bird)
+void render(sf::RenderWindow &window, const Bird &bird, const Background &background)
 {
-	window.clear();
+	window.clear(SKY_COLOR);
+	window.draw(background.wrapper);
 	window.draw(bird.shape);
 	window.display();
 }
@@ -35,10 +39,12 @@ int main()
 
 	Bird bird;
 	initializeBird(bird);
+	Background background;
+	initializeBackground(background);
 
 	while (window.isOpen())
 	{
 		handleEvents(window);
-		render(window, bird);
+		render(window, bird, background);
 	}
 }
