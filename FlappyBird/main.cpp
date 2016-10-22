@@ -9,7 +9,7 @@ static const sf::Color SKY_COLOR = sf::Color(0, 153, 204);
 
 const float SPEED = 160.f; // pixels per second.
 
-void handleEvents(sf::RenderWindow &window)
+void handleEvents(sf::RenderWindow &window, Bird &bird)
 {
 	sf::Event event;
 	while (window.pollEvent(event))
@@ -17,6 +17,10 @@ void handleEvents(sf::RenderWindow &window)
 		if (event.type == sf::Event::Closed)
 		{
 			window.close();
+		}
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+		{
+			birdJump(bird);
 		}
 	}
 }
@@ -48,6 +52,7 @@ void render(sf::RenderWindow &window, const Bird &bird, Background &background)
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), "Flappy Bird");
+	window.setKeyRepeatEnabled(false);
 
 	Bird bird;
 	if (!initializeBird(bird))
@@ -60,7 +65,7 @@ int main()
 
 	while (window.isOpen())
 	{
-		handleEvents(window);
+		handleEvents(window, bird);
 		update(clock, background);
 		render(window, bird, background);
 	}
