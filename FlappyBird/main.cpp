@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "bird.h"
 #include "background.h"
+#include "interface.h"
 
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
@@ -36,18 +37,19 @@ void update(sf::Clock &clock, Background &background, Bird &bird)
 	moveGround(moveSpeed, background.ground);
 }
 
-void render(sf::RenderWindow &window, const Bird &bird, Background &background)
+void render(sf::RenderWindow &window, const Bird &bird, Background &background, Interface &gui)
 {
 	window.clear(SKY_COLOR);
 	window.draw(background.wrapper);
 	drawGround(window, background.ground);
+	window.draw(gui.pointsText);
 	window.draw(bird.shape);
 	window.display();
 }
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), "Flappy Bird");
+	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), "Flappy Bird", sf::Style::Titlebar + sf::Style::Close);
 	window.setKeyRepeatEnabled(false);
 
 	Bird bird;
@@ -56,6 +58,9 @@ int main()
 	Background background;
 	if (!initializeBackground(background))
 		return EXIT_FAILURE;
+	Interface gui;
+	if (!initializeInterface(gui))
+		return EXIT_FAILURE;
 
 	sf::Clock clock;
 
@@ -63,7 +68,7 @@ int main()
 	{
 		handleEvents(window, bird);
 		update(clock, background, bird);
-		render(window, bird, background);
+		render(window, bird, background, gui);
 	}
 
 	return 0;

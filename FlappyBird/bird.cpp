@@ -6,7 +6,7 @@ static const sf::Vector2f BIRD_SIZE = { 60 , 64 };
 static const sf::Vector2f BIRD_POSITION = { 50, 320 };
 
 static const float JUMP_HEIGHT = 70;
-static const float G = 8;
+static const float G = 8.4;
 static const float IMPULSE = 100;
 
 bool initializeBird(Bird &bird)
@@ -15,7 +15,7 @@ bool initializeBird(Bird &bird)
 	bird.jumpingVector = {0, 0, 0}; // {speed, time, past height}
 	bird.shape.setSize(BIRD_SIZE);
 	if (!bird.shapeTexture.loadFromFile("resources/MainHero.png"))
-		return EXIT_FAILURE;
+		return false;
 	bird.shape.setTexture(&bird.shapeTexture);
 	bird.shape.setPosition(BIRD_POSITION);
 

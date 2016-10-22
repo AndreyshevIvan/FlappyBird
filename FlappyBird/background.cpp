@@ -24,7 +24,7 @@ bool inititalizeWrapper(Background &background)
 bool inititalizeGround(Background &background)
 {
 	if (!background.groundTexture.loadFromFile("resources/ground.png"))
-		return EXIT_FAILURE;
+		return false;
 	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
 	{
 		background.ground[groundNumber] = sf::RectangleShape(GROUND_SIZE);
@@ -38,7 +38,7 @@ bool inititalizeGround(Background &background)
 bool initializeBackground(Background &background)
 {
 	if (!inititalizeWrapper(background) || !inititalizeGround(background))
-		return EXIT_FAILURE;
+		return false;
 
 	return true;
 }
