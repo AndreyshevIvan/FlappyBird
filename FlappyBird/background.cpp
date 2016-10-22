@@ -1,11 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include "background.h"
 
-static const sf::Vector2f GROUND_SIZE = { 480, 90 };
-static const sf::Vector2f GROUND_POS = { 0, 640 - GROUND_SIZE.y };
+static const float RESOLUTION_W = 480;
+static const float RESOLUTION_H = 640;
+
+static const sf::Vector2f GROUND_SIZE = { RESOLUTION_W, 90 };
+static const sf::Vector2f GROUND_POS = { 0, RESOLUTION_H - GROUND_SIZE.y };
 static const sf::Vector2f GROUND_OFFSET = { 439, 0 };
-static const sf::Vector2f WRAPPER_SIZE = { 480, 125 };
-static const sf::Vector2f WRAPPER_POS = { 0, 640 - GROUND_SIZE.y - WRAPPER_SIZE.y };
+static const sf::Vector2f WRAPPER_SIZE = { RESOLUTION_W, 125 };
+static const sf::Vector2f WRAPPER_POS = { 0, RESOLUTION_H - GROUND_SIZE.y - WRAPPER_SIZE.y };
+
 
 bool inititalizeWrapper(Background &background)
 {
@@ -40,7 +44,7 @@ bool initializeBackground(Background &background)
 	return true;
 }
 
-bool drawGround(sf::RenderWindow &window, const sf::RectangleShape ground[])
+bool drawGround(sf::RenderWindow &window, sf::RectangleShape ground[])
 {
 	for (int groundNumber = 0; groundNumber < 3; groundNumber++)
 	{
@@ -48,4 +52,12 @@ bool drawGround(sf::RenderWindow &window, const sf::RectangleShape ground[])
 	}
 
 	return true;
+}
+
+void moveGround(float &moveSpeed, sf::RectangleShape ground[])
+{
+	for (int groundNumber = 0; groundNumber < 3; groundNumber++)
+	{
+		ground[groundNumber].move(-moveSpeed, 0);
+	}
 }

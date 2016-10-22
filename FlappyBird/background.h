@@ -12,4 +12,5 @@ struct Background
 bool initializeBackground(Background &background);
 bool inititalizeWrapper(Background &background);
 bool inititalizeGround(Background &background);
-bool drawGround(sf::RenderWindow &window, const sf::RectangleShape ground[]);
+bool drawGround(sf::RenderWindow &window, sf::RectangleShape ground[]);
+void moveGround(float &moveSpeed, sf::RectangleShape ground[]);

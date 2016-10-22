@@ -7,6 +7,8 @@ static const int RESOLUTION_H = 640;
 
 static const sf::Color SKY_COLOR = sf::Color(0, 153, 204);
 
+const float SPEED = 60.f; // pixels per second.
+
 void handleEvents(sf::RenderWindow &window)
 {
 	sf::Event event;
@@ -19,13 +21,22 @@ void handleEvents(sf::RenderWindow &window)
 	}
 }
 
-void update(sf::Clock &clock)
+float calculateMoveSpeed(sf::Clock &clock)
 {
 	const float elapsedTime = clock.getElapsedTime().asSeconds();
-	clock.restart();
+	const float STEP = SPEED * elapsedTime;
+
+	return STEP;
 }
 
-void render(sf::RenderWindow &window, const Bird &bird, const Background &background)
+void update(sf::Clock &clock, Background &background)
+{
+	float moveSpeed = calculateMoveSpeed(clock);
+	clock.restart();
+	moveGround(moveSpeed, background.ground);
+}
+
+void render(sf::RenderWindow &window, const Bird &bird, Background &background)
 {
 	window.clear(SKY_COLOR);
 	window.draw(background.wrapper);
@@ -45,9 +56,12 @@ int main()
 	if(!initializeBackground(background))
 		return EXIT_FAILURE;
 
+	sf::Clock clock;
+
 	while (window.isOpen())
 	{
 		handleEvents(window);
+		update(clock, background);
 		render(window, bird, background);
 	}
 
