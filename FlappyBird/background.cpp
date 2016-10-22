@@ -26,7 +26,7 @@ bool inititalizeGround(Background &background)
 {
 	if (!background.groundTexture.loadFromFile("resources/ground.png"))
 		return EXIT_FAILURE;
-	for (int groundNumber = 0; groundNumber < 3; groundNumber++)
+	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
 	{
 		background.ground[groundNumber] = sf::RectangleShape(GROUND_SIZE);
 		background.ground[groundNumber].setTexture(&background.groundTexture);
@@ -46,7 +46,7 @@ bool initializeBackground(Background &background)
 
 bool drawGround(sf::RenderWindow &window, sf::RectangleShape ground[])
 {
-	for (int groundNumber = 0; groundNumber < 3; groundNumber++)
+	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
 	{
 		window.draw(ground[groundNumber]);
 	}
@@ -56,8 +56,10 @@ bool drawGround(sf::RenderWindow &window, sf::RectangleShape ground[])
 
 void moveGround(float &moveSpeed, sf::RectangleShape ground[])
 {
-	for (int groundNumber = 0; groundNumber < 3; groundNumber++)
+	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
 	{
+		if ((ground[groundNumber].getPosition().x + GROUND_SIZE.x) <= 0)
+			ground[groundNumber].setPosition(ground[groundNumber].getPosition().x + (GROUND_OFFSET.x * GROUNDS_COUNT), GROUND_POS.y);
 		ground[groundNumber].move(-moveSpeed, 0);
 	}
 }

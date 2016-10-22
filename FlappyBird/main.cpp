@@ -7,7 +7,7 @@ static const int RESOLUTION_H = 640;
 
 static const sf::Color SKY_COLOR = sf::Color(0, 153, 204);
 
-const float SPEED = 60.f; // pixels per second.
+const float SPEED = 180.f; // pixels per second.
 
 void handleEvents(sf::RenderWindow &window)
 {
