@@ -10,7 +10,6 @@ static const sf::Vector2f GROUND_OFFSET = { 439, 0 };
 static const sf::Vector2f WRAPPER_SIZE = { RESOLUTION_W, 125 };
 static const sf::Vector2f WRAPPER_POS = { 0, RESOLUTION_H - GROUND_SIZE.y - WRAPPER_SIZE.y };
 
-
 bool inititalizeWrapper(Background &background)
 {
 	if (!background.wrapperTexture.loadFromFile("resources/wrapper.png"))

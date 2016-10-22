@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-const int GROUNDS_COUNT = 3;
+static const sf::Color SKY_COLOR = sf::Color(0, 153, 204);
+static const int GROUNDS_COUNT = 3;
 
 struct Background
 {

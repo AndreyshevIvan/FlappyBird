@@ -5,8 +5,6 @@
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
 
-static const sf::Color SKY_COLOR = sf::Color(0, 153, 204);
-
 const float SPEED = 160.f; // pixels per second.
 
 void handleEvents(sf::RenderWindow &window, Bird &bird)
@@ -20,23 +18,21 @@ void handleEvents(sf::RenderWindow &window, Bird &bird)
 		}
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 		{
-			birdJump(bird);
+			startJump(bird);
 		}
 	}
 }
 
-float calculateMoveSpeed(sf::Clock &clock)
+void update(sf::Clock &clock, Background &background, Bird &bird)
 {
 	const float elapsedTime = clock.getElapsedTime().asSeconds();
-	const float STEP = SPEED * elapsedTime;
+	float moveSpeed  = SPEED * elapsedTime;
 
-	return STEP;
-}
-
-void update(sf::Clock &clock, Background &background)
-{
-	float moveSpeed = calculateMoveSpeed(clock);
 	clock.restart();
+	if (bird.jumping == STARTED)
+	{
+		birdJump(elapsedTime, bird);
+	}
 	moveGround(moveSpeed, background.ground);
 }
 
@@ -66,7 +62,7 @@ int main()
 	while (window.isOpen())
 	{
 		handleEvents(window, bird);
-		update(clock, background);
+		update(clock, background, bird);
 		render(window, bird, background);
 	}
 
