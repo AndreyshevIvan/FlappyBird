@@ -13,4 +13,4 @@ struct Bird
 	Direction direction;
 };
 
-void initializeBird(Bird &bird);
+bool initializeBird(Bird &bird);

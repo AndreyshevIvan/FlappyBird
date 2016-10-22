@@ -9,4 +9,7 @@ struct Background
 	sf::Texture wrapperTexture;
 };
 
-bool initializeBackground(Background &baclground);
+bool initializeBackground(Background &background);
+bool inititalizeWrapper(Background &background);
+bool inititalizeGround(Background &background);
+bool drawGround(sf::RenderWindow &window, const sf::RectangleShape ground[]);

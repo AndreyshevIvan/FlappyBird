@@ -29,6 +29,7 @@ void render(sf::RenderWindow &window, const Bird &bird, const Background &backgr
 {
 	window.clear(SKY_COLOR);
 	window.draw(background.wrapper);
+	drawGround(window, background.ground);
 	window.draw(bird.shape);
 	window.display();
 }
@@ -38,13 +39,17 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), "Flappy Bird");
 
 	Bird bird;
-	initializeBird(bird);
+	if(!initializeBird(bird))
+		return(EXIT_FAILURE);
 	Background background;
-	initializeBackground(background);
+	if(!initializeBackground(background))
+		return EXIT_FAILURE;
 
 	while (window.isOpen())
 	{
 		handleEvents(window);
 		render(window, bird, background);
 	}
+
+	return 0;
 }
