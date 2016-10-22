@@ -7,7 +7,7 @@ static const int RESOLUTION_H = 640;
 
 static const sf::Color SKY_COLOR = sf::Color(0, 153, 204);
 
-const float SPEED = 180.f; // pixels per second.
+const float SPEED = 160.f; // pixels per second.
 
 void handleEvents(sf::RenderWindow &window)
 {
@@ -50,10 +50,10 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), "Flappy Bird");
 
 	Bird bird;
-	if(!initializeBird(bird))
+	if (!initializeBird(bird))
 		return(EXIT_FAILURE);
 	Background background;
-	if(!initializeBackground(background))
+	if (!initializeBackground(background))
 		return EXIT_FAILURE;
 
 	sf::Clock clock;

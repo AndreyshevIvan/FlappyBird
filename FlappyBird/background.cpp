@@ -40,7 +40,7 @@ bool initializeBackground(Background &background)
 {
 	if (!inititalizeWrapper(background) || !inititalizeGround(background))
 		return EXIT_FAILURE;
-	
+
 	return true;
 }
 
