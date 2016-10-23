@@ -1,10 +1,12 @@
+#pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "bird.h"
 #include <cmath>
-#include <iostream>
 
 static const sf::Vector2f BIRD_SIZE = { 40 , 28 };
 static const sf::Vector2f BIRD_POSITION = { 80, 320 };
+static const int COLLISION_SHAPE_RADIUS = 10;
 
 static const float JUMP_HEIGHT = 70;
 static const float G = 12;
@@ -12,7 +14,8 @@ static const float IMPULSE = 200;
 
 static const float UP_ROT_ANGALE = -50;
 static const float DOWN_ROT_ANGLE = 90;
-static const float DOWN_ROT_SPEED = 0.6;
+static const float DOWN_ROT_SPEED = 0.9;
+
 static const float FLAPPING_SPEED = 15;
 
 bool initializeBird(Bird &bird)
@@ -29,6 +32,11 @@ bool initializeBird(Bird &bird)
 	bird.jumpingVector = { 0, 0, 0 }; // {speed, time, past height}
 	bird.animTime = 0;
 
+	bird.collisionShape.setRadius(COLLISION_SHAPE_RADIUS);
+	bird.collisionShape.setOrigin(bird.collisionShape.getGlobalBounds().width / 2.0f, bird.collisionShape.getGlobalBounds().height / 2.0f);
+	bird.collisionShape.setPosition(BIRD_POSITION);
+	bird.collisionShape.setFillColor(sf::Color::White);
+
 	return true;
 }
 
@@ -42,9 +50,14 @@ void animateBird(Bird &bird, const float &elapsedTime)
 	bird.shape.setTextureRect(sf::IntRect((int)bird.animTime * 40, 0, 40, 28));
 }
 
-void startJump(Bird &bird)
+void startJump(Bird &bird, Interface &gui)
 {
-	bird.jumping = STARTED;
+	gui.wingSound.play();
+	if (bird.jumping != STARTED)
+	{
+		gui.ost.play();
+		bird.jumping = STARTED;
+	}
 	bird.jumpingVector[0] = sqrt((2.0f * JUMP_HEIGHT) / G);
 	bird.jumpingVector[1] = 0;
 	bird.jumpingVector[2] = 0;
@@ -77,4 +90,5 @@ void birdJump(const float &elapsedTime, Bird &bird)
 	}
 
 	bird.shape.move(0, IMPULSE * movement);
+	bird.collisionShape.setPosition(bird.shape.getPosition());
 }

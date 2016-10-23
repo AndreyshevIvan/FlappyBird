@@ -2,7 +2,6 @@
 #include <SFML/Audio.hpp>
 #include "interface.h"
 #include "background.h"
-#include <iostream>
 
 static const float RESOLUTION_W = 480;
 
@@ -23,7 +22,7 @@ bool initializeInterface(Interface &gui)
 	gui.pointsText.setFillColor(sf::Color::White);
 	gui.pointsText.setPosition(POINTS_POS);
 	gui.pointsCount = 0;
-	createSound(gui.pointSound);
+	createSound(gui);
 
 	return true;
 }
@@ -47,10 +46,44 @@ int addPoint(Interface &gui)
 	return 0;
 }
 
-bool createSound(sf::Music &pointSound)
+bool createSound(Interface &gui)
 {
-	if (!pointSound.openFromFile("resources/Sounds/sfx_point.ogg"))
+	if (!gui.pointSound.openFromFile("resources/Sounds/point.ogg"))
+		return EXIT_FAILURE;
+	if (!gui.wingSound.openFromFile("resources/Sounds/sfx_wing.ogg"))
+		return EXIT_FAILURE;
+	if (!gui.failSound.openFromFile("resources/Sounds/sfx_hit.ogg"))
+		return EXIT_FAILURE;
+	if (!gui.ost.openFromFile("resources/Sounds/OST.ogg"))
 		return EXIT_FAILURE;
 
+	gui.pointSound.setVolume(60);
+	gui.wingSound.setVolume(50);
+	gui.failSound.setVolume(50);
+	gui.ost.setVolume(30);
+
 	return true;
+}
+
+void gameOverMenu(sf::RenderWindow &window, Interface &gui)
+{
+	bool continueFlag = false;
+	while (!continueFlag)
+	{
+		gui.ost.stop();
+		sf::Event event;
+
+		while (!window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+			{
+				window.close();
+				exit(1);
+			}
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+			{
+				
+			}
+		}
+	}
 }

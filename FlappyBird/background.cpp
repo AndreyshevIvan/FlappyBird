@@ -1,3 +1,4 @@
+#pragma once
 #include <SFML/Graphics.hpp>
 #include "background.h"
 #include "interface.h"
@@ -14,7 +15,7 @@ static const sf::Vector2f WRAPPER_POS = { 0, RESOLUTION_H - GROUND_SIZE.y - WRAP
 
 static const sf::Vector2f TUBE_SIZE = { 52, 400 };
 static const float TUBES_OFFSET = 220;
-static const float INIT_OFFSET = 300;
+static const float INIT_OFFSET = 750;
 static const float TUBE_GAP = 180;
 static const float VERTICAL_OFFSET = 60;
 static const int MIN_TUBE_HEIGHT = TUBE_GAP + VERTICAL_OFFSET;

@@ -10,6 +10,10 @@ struct Interface
 	sf::Text pointsText;
 	int pointsCount;
 	sf::Music pointSound;
+	sf::Music wingSound;
+	sf::Music failSound;
+	sf::Music tenPointsSound;
+	sf::Music ost;
 };
 
 template <typename T>
@@ -22,4 +26,5 @@ std::string toString(T val)
 
 bool initializeInterface(Interface &gui);
 int addPoint(Interface &gui);
-bool createSound(sf::Music &pointSound);
+bool createSound(Interface &gui);
+void gameOverMenu(sf::RenderWindow &window, Interface &gui);

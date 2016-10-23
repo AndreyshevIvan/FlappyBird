@@ -3,14 +3,13 @@
 #include "bird.h"
 #include "background.h"
 #include "interface.h"
-#include <iostream>
 
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
 
 const float SPEED = 250.f; // pixels per second.
 
-void handleEvents(sf::RenderWindow &window, Bird &bird)
+void handleEvents(sf::RenderWindow &window, Bird &bird, Interface &gui)
 {
 	sf::Event event;
 	while (window.pollEvent(event))
@@ -21,7 +20,7 @@ void handleEvents(sf::RenderWindow &window, Bird &bird)
 		}
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 		{
-			startJump(bird);
+			startJump(bird, gui);
 		}
 	}
 }
@@ -43,9 +42,9 @@ bool collision(Bird &bird, Background background, Interface &gui)
 {
 	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
 	{
-		if (bird.shape.getGlobalBounds().intersects(background.ground[groundNumber].getGlobalBounds()))
+		if (bird.collisionShape.getGlobalBounds().intersects(background.ground[groundNumber].getGlobalBounds()))
 		{
-			startGame(bird, background, gui);
+			gui.failSound.play();
 			return true;
 		}
 	}
@@ -53,11 +52,11 @@ bool collision(Bird &bird, Background background, Interface &gui)
 	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
 	{
 		if (
-			bird.shape.getGlobalBounds().intersects(background.tubes[tubeNumber][0].getGlobalBounds()) ||
-			bird.shape.getGlobalBounds().intersects(background.tubes[tubeNumber][1].getGlobalBounds())
+			bird.collisionShape.getGlobalBounds().intersects(background.tubes[tubeNumber][0].getGlobalBounds()) ||
+			bird.collisionShape.getGlobalBounds().intersects(background.tubes[tubeNumber][1].getGlobalBounds())
 			)
 		{
-			startGame(bird, background, gui);
+			gui.failSound.play();
 			return true;
 		}
 	}
@@ -65,18 +64,16 @@ bool collision(Bird &bird, Background background, Interface &gui)
 	return false;
 }
 
-void update(sf::Clock &clock, Background &background, Bird &bird, Interface &gui)
+void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, Bird &bird, Interface &gui)
 {
 	const float elapsedTime = clock.getElapsedTime().asSeconds();
 	float moveSpeed = SPEED * elapsedTime;
 	clock.restart();
 
 	if (collision(bird, background, gui))
-		startGame(bird, background, gui);
+		gameOverMenu(window, gui);
 
 	animateBird(bird, elapsedTime);
-
-	
 
 	if (bird.jumping == STARTED)
 	{
@@ -112,8 +109,8 @@ int main()
 
 	while (window.isOpen())
 	{
-		handleEvents(window, bird);
-		update(clock, background, bird, gui);
+		handleEvents(window, bird, gui);
+		update(window, clock, background, bird, gui);
 		render(window, bird, background, gui);
 	}
 
