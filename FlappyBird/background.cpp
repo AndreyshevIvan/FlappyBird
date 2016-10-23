@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "background.h"
-#include <iostream>
-#include <ctime>
+#include "interface.h"
+#include "bird.h"
 
 static const float RESOLUTION_W = 480;
 static const float RESOLUTION_H = 640;
@@ -16,10 +16,9 @@ static const sf::Vector2f TUBE_SIZE = { 52, 400 };
 static const float TUBES_OFFSET = 220;
 static const float INIT_OFFSET = 300;
 static const float TUBE_GAP = 160;
-static const float TOP_OFFSET = 80;
-static const float BOTTOM_OFFSET = 80;
-static const int MIN_TUBE_HEIGHT = TUBE_GAP + GROUND_SIZE.y + TOP_OFFSET; // 160 + 70 + 80 = 210
-static const int MAX_TUBE_HEIGHT = RESOLUTION_H - GROUND_SIZE.y - BOTTOM_OFFSET; // 640 - 70 - 50 = 520
+static const float VERTICAL_OFFSET = 60;
+static const int MIN_TUBE_HEIGHT = TUBE_GAP + VERTICAL_OFFSET; //
+static const int MAX_TUBE_HEIGHT = RESOLUTION_H - GROUND_SIZE.y - VERTICAL_OFFSET; // 
 
 bool inititalizeWrapper(Background &background)
 {
@@ -48,7 +47,9 @@ bool inititalizeGround(Background &background)
 
 bool inititalizeTubes(Background &background)
 {
-	if (!background.tubeTexture.loadFromFile("resources/tube.png"))
+	if (!background.tubeTextureBottom.loadFromFile("resources/tubeBottom.png"))
+		return false;
+	if (!background.tubeTextureTop.loadFromFile("resources/tubeTop.png"))
 		return false;
 	for (int tubesNumber = 0; tubesNumber < TUBES_COUNT; tubesNumber++)
 	{
@@ -56,15 +57,15 @@ bool inititalizeTubes(Background &background)
 		sf::RectangleShape topTube;
 
 		int randomHeight = MIN_TUBE_HEIGHT + rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT);
-		std::cout << randomHeight << "\n";
 
 		bottomTube = sf::RectangleShape(TUBE_SIZE);
-		bottomTube.setTexture(&background.tubeTexture);
+		bottomTube.setTexture(&background.tubeTextureBottom);
 		bottomTube.setOrigin(bottomTube.getGlobalBounds().width / 2.0f, 0);
 		bottomTube.setPosition(RESOLUTION_W + INIT_OFFSET + tubesNumber * TUBES_OFFSET, randomHeight);
 
 		topTube = bottomTube;
 		topTube.rotate(180);
+		topTube.setTexture(&background.tubeTextureTop);
 		topTube.setPosition(bottomTube.getPosition().x, bottomTube.getPosition().y - TUBE_GAP);
 
 		background.tubes[tubesNumber][0] = bottomTube;
@@ -82,6 +83,8 @@ bool initializeBackground(Background &background)
 		!inititalizeTubes(background)
 		)
 		return false;
+	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
+		background.tubeStatus[tubeNumber] = false;
 
 	return true;
 }
@@ -113,25 +116,31 @@ void drawTubes(sf::RenderWindow &window, Background &background)
 	}
 }
 
-void moveTubes(float &moveSpeed, Background &background)
+void moveTubes(float &moveSpeed, Background &background, Bird &bird, Interface &gui)
 {
 	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
 	{
 		sf::RectangleShape bottomTube = background.tubes[tubeNumber][0];
 		sf::RectangleShape topTube = background.tubes[tubeNumber][1];
-		if (bottomTube.getPosition().x + TUBE_SIZE.x <= 0)
+		if (bottomTube.getPosition().x + TUBE_SIZE.x / 2.0f <= 0)
 		{
 			int randomHeight = rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT) + MIN_TUBE_HEIGHT;
-
-			std::cout << randomHeight << "\n";
 
 			bottomTube.setPosition(bottomTube.getPosition().x + (TUBES_OFFSET * TUBES_COUNT), randomHeight);
 			topTube.setPosition(topTube.getPosition().x + (TUBES_OFFSET * TUBES_COUNT), bottomTube.getPosition().y - TUBE_GAP);
 
 			background.tubes[tubeNumber][0].setPosition(bottomTube.getPosition());
 			background.tubes[tubeNumber][1].setPosition(topTube.getPosition());
+
+			background.tubeStatus[tubeNumber] = false;
 		}
 		background.tubes[tubeNumber][0].move(-moveSpeed, 0);
 		background.tubes[tubeNumber][1].move(-moveSpeed, 0);
+
+		if (background.tubes[tubeNumber][0].getPosition().x <= bird.shape.getPosition().x && !background.tubeStatus[tubeNumber])
+		{
+			background.tubeStatus[tubeNumber] = true;
+			addPoint(gui);
+		}
 	}
 }

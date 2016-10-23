@@ -41,7 +41,7 @@ void update(sf::Clock &clock, Background &background, Bird &bird, Interface &gui
 	if (bird.jumping == STARTED)
 	{
 		birdJump(elapsedTime, bird);
-		moveTubes(moveSpeed, background);
+		moveTubes(moveSpeed, background, bird, gui);
 	}
 	moveGround(moveSpeed, background.ground);
 }
