@@ -5,7 +5,7 @@
 static const float RESOLUTION_W = 480;
 
 static const int FONT_SIZE = 50;
-static const sf::Vector2f POINTS_POS = { RESOLUTION_W / 2.0f, 50 };
+static const sf::Vector2f POINTS_POS = { RESOLUTION_W / 2.0f, 0 };
 
 bool initializeInterface(Interface &gui)
 {
