@@ -13,8 +13,10 @@ struct Bird
 	std::vector<float> jumpingVector; // {speed, time, past height}
 	sf::RectangleShape shape;
 	sf::Texture shapeTexture;
+	float animTime;
 };
 
 bool initializeBird(Bird &bird);
 void startJump(Bird &bird);
 void birdJump(const float &elapsedTime, Bird &bird);
+void animateBird(Bird &bird, const float &elapsedTime);

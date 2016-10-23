@@ -7,25 +7,39 @@ static const sf::Vector2f BIRD_SIZE = { 40 , 28 };
 static const sf::Vector2f BIRD_POSITION = { 80, 320 };
 
 static const float JUMP_HEIGHT = 70;
-static const float G = 11;
+static const float G = 12;
 static const float IMPULSE = 200;
 
 static const float UP_ROT_ANGALE = -50;
 static const float DOWN_ROT_ANGLE = 90;
 static const float DOWN_ROT_SPEED = 0.6;
+static const float FLAPPING_SPEED = 15;
 
 bool initializeBird(Bird &bird)
 {
-	bird.jumping = NOT_STARTED;
-	bird.jumpingVector = {0, 0, 0}; // {speed, time, past height}
 	bird.shape.setSize(BIRD_SIZE);
 	if (!bird.shapeTexture.loadFromFile("resources/MainHero.png"))
 		return false;
 	bird.shape.setTexture(&bird.shapeTexture);
+	bird.shape.setTextureRect(sf::IntRect(40, 0, 40, 28));
+	bird.shape.setRotation(0);
 	bird.shape.setOrigin(bird.shape.getGlobalBounds().width / 2.0f, bird.shape.getGlobalBounds().height / 2.0f);
 	bird.shape.setPosition(BIRD_POSITION);
+	bird.jumping = NOT_STARTED;
+	bird.jumpingVector = { 0, 0, 0 }; // {speed, time, past height}
+	bird.animTime = 0;
 
 	return true;
+}
+
+void animateBird(Bird &bird, const float &elapsedTime)
+{
+	bird.animTime += FLAPPING_SPEED * elapsedTime;
+	if ((int)bird.animTime > 2)
+	{
+		bird.animTime = 0;
+	}
+	bird.shape.setTextureRect(sf::IntRect((int)bird.animTime * 40, 0, 40, 28));
 }
 
 void startJump(Bird &bird)

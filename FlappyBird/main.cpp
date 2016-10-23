@@ -1,7 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "bird.h"
 #include "background.h"
 #include "interface.h"
+#include <iostream>
 
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
@@ -24,9 +26,41 @@ void handleEvents(sf::RenderWindow &window, Bird &bird)
 	}
 }
 
-bool collision(sf::RectangleShape &rectOne, sf::RectangleShape rectTwo[])
+bool startGame(Bird &bird, Background &background, Interface &gui)
 {
+	srand(time(NULL));
+	if (!initializeBird(bird))
+		return(EXIT_FAILURE);
+	if (!initializeBackground(background))
+		return EXIT_FAILURE;
+	if (!initializeInterface(gui))
+		return EXIT_FAILURE;
 
+	return true;
+}
+
+bool collision(Bird &bird, Background background, Interface &gui)
+{
+	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
+	{
+		if (bird.shape.getGlobalBounds().intersects(background.ground[groundNumber].getGlobalBounds()))
+		{
+			startGame(bird, background, gui);
+			return true;
+		}
+	}
+
+	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
+	{
+		if (
+			bird.shape.getGlobalBounds().intersects(background.tubes[tubeNumber][0].getGlobalBounds()) ||
+			bird.shape.getGlobalBounds().intersects(background.tubes[tubeNumber][1].getGlobalBounds())
+			)
+		{
+			startGame(bird, background, gui);
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -34,9 +68,15 @@ bool collision(sf::RectangleShape &rectOne, sf::RectangleShape rectTwo[])
 void update(sf::Clock &clock, Background &background, Bird &bird, Interface &gui)
 {
 	const float elapsedTime = clock.getElapsedTime().asSeconds();
-	float moveSpeed  = SPEED * elapsedTime;
-
+	float moveSpeed = SPEED * elapsedTime;
 	clock.restart();
+
+	if (collision(bird, background, gui))
+		startGame(bird, background, gui);
+
+	animateBird(bird, elapsedTime);
+
+	
 
 	if (bird.jumping == STARTED)
 	{
@@ -55,19 +95,6 @@ void render(sf::RenderWindow &window, const Bird &bird, Background &background, 
 	window.draw(gui.pointsText);
 	window.draw(bird.shape);
 	window.display();
-}
-
-bool startGame(Bird &bird, Background &background, Interface &gui)
-{
-	srand(time(NULL));
-	if (!initializeBird(bird))
-		return(EXIT_FAILURE);
-	if (!initializeBackground(background))
-		return EXIT_FAILURE;
-	if (!initializeInterface(gui))
-		return EXIT_FAILURE;
-
-	return true;
 }
 
 int main()
