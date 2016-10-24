@@ -7,6 +7,7 @@
 #include <iostream>
 
 static const float RESOLUTION_W = 480;
+static const float RESOLUTION_H = 640;
 
 static const int FONT_SIZE = 40;
 static const sf::Vector2f POINTS_POS = { RESOLUTION_W / 2.0f, 20 };
@@ -15,16 +16,22 @@ static const sf::Color FONT_OUTLINE_COLOR = sf::Color(84, 56, 71);
 static const int POINTS_TO_WIN = 100;
 
 static const sf::Vector2f STATISTIC_SIZE = { 300, 150 };
+static const sf::Vector2f STATISTIC_POS = { RESOLUTION_W / 2.0f, RESOLUTION_H / 2.0f };
 static const sf::Vector2f GUIDE_SIZE = { 150, 156 };
 static const sf::Vector2f GUIDE_POSITION = { 120, 325 };
 static const sf::Vector2f GAME_NAME_SIZE = { 250, 67 };
 static const sf::Vector2f GAME_OVER_SIZE = { 192, 42 };
 
+static const sf::Vector2f SCORE_POS = { RESOLUTION_W  / 2.0f + 70, RESOLUTION_H / 2.0f - 34};
+static const int SCORE_SIZE = 30;
+
+static const int PRESS_R_SIZE = 20;
+
 static const float FLAPPING_SPEED = 15;
 static const float OSCILLATION_AMPLITUDE = 0.12;
 
 
-void initializePoints(Interface &gui)
+void initializePoints(Interface &gui) 
 {
 	sf::Text startPoints("0", gui.pointsFont, FONT_SIZE);
 	gui.points = startPoints;
@@ -36,11 +43,36 @@ void initializePoints(Interface &gui)
 	gui.pointsCount = 0;
 }
 
+void initializeScore(Interface &gui)
+{
+	sf::Text startPoints("0", gui.pointsFont, SCORE_SIZE);
+
+	gui.score = startPoints;
+	gui.score.setOrigin(gui.score.getCharacterSize() / 4.0, 0);
+	gui.score.setOutlineColor(FONT_OUTLINE_COLOR);
+	gui.score.setOutlineThickness(FONT_THICKNESS);
+	gui.score.setFillColor(sf::Color::White);
+	gui.score.setPosition(SCORE_POS);
+	gui.score.setString(toString(gui.pointsCount));
+}
+
+void initializePressR(Interface &gui)
+{
+	sf::Text startPoints("PRESS 'R' TO RESTART", gui.pointsFont, PRESS_R_SIZE);
+
+	gui.pressR = startPoints;
+	gui.pressR.setOrigin(100, 0);
+	gui.pressR.setOutlineColor(FONT_OUTLINE_COLOR);
+	gui.pressR.setOutlineThickness(FONT_THICKNESS);
+	gui.pressR.setFillColor(sf::Color::White);
+	gui.pressR.setPosition(RESOLUTION_W / 2.0f, gui.statistic.getPosition().y + 100);
+}
+
 void initializeStatistic(Interface &gui)
 {
 	gui.statistic.setSize(STATISTIC_SIZE);
 	gui.statistic.setOrigin(gui.statistic.getGlobalBounds().width / 2.0f, gui.statistic.getGlobalBounds().height / 2.0f);
-	gui.statistic.setPosition(RESOLUTION_W / 2.0f, -STATISTIC_SIZE.y);
+	gui.statistic.setPosition(RESOLUTION_W / 2.0f, RESOLUTION_H / 2.0f);
 	gui.statistic.setTexture(&gui.statisticTexture);
 }
 
@@ -65,7 +97,7 @@ void initializeGameOver(Interface &gui)
 {
 	gui.gameOver.setSize(GAME_OVER_SIZE);
 	gui.gameOver.setOrigin(gui.gameOver.getGlobalBounds().width / 2.0f, gui.gameOver.getGlobalBounds().height / 2.0f);
-	gui.gameOver.setPosition(RESOLUTION_W / 2.0f, -GAME_OVER_SIZE.y);
+	gui.gameOver.setPosition(RESOLUTION_W / 2.0f, gui.statistic.getPosition().y - gui.statistic.getGlobalBounds().height);
 	gui.gameOver.setTexture(&gui.gameOverTexture);
 }
 
@@ -98,6 +130,7 @@ bool initializeInterface(Interface &gui)
 
 	initializePoints(gui);
 	initializeStatistic(gui);
+	initializePressR(gui);
 	initializeGuide(gui);
 	initializeGameName(gui);
 	initializeGameOver(gui);

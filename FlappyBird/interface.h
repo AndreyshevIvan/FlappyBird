@@ -8,7 +8,8 @@ struct Interface
 {
 	sf::Font pointsFont;
 	sf::Text points;
-	sf::Text resultPoints;
+	sf::Text score;
+	sf::Text pressR;
 	int pointsCount;
 	sf::Music pointSound;
 	sf::Music wingSound;
@@ -36,7 +37,9 @@ std::string toString(T val)
 bool initializeInterface(Interface &gui);
 bool initializeGuiFiles(Interface &gui);
 void initializePoints(Interface &gui);
+void initializeScore(Interface &gui);
 void initializeStatistic(Interface &gui);
+void initializePressR(Interface &gui);
 void initializeGuide(Interface &gui);
 void initializeGameName(Interface &gui);
 void initializeGameOver(Interface &gui);

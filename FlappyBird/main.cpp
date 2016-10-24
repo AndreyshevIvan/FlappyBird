@@ -22,13 +22,6 @@ bool startGame(Bird &bird, Background &background, Interface &gui)
 	return true;
 }
 
-void gameOver(Bird &bird, Background &background, Interface &gui)
-{
-	gui.failSound.play();
-	bird.status = GAME_PAUSED;
-	gui.statistic.move(0, RESOLUTION_H / 2.0f + gui.statistic.getSize().y);
-}
-
 void handleEvents(sf::RenderWindow &window, Bird &bird, Background &background, Interface &gui)
 {
 	sf::Event event;
@@ -86,7 +79,11 @@ void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, 
 		birdJump(elapsedTime, bird);
 		moveTubes(moveSpeed, background, bird, gui);
 		if (collision(bird, background, gui))
-			gameOver(bird, background, gui);
+		{
+			gui.failSound.play();
+			initializeScore(gui);
+			bird.status = GAME_PAUSED;
+		}
 		break;
 	case GAME_PAUSED:
 		break;
@@ -102,11 +99,17 @@ void render(sf::RenderWindow &window, const Bird &bird, Background &background, 
 	if (bird.status == PLAYING)
 		window.draw(gui.points);
 	window.draw(bird.shape);
-	window.draw(gui.statistic);
 	if (bird.status == NOT_STARTED)
 	{
 		window.draw(gui.gameName);
 		window.draw(gui.guide);
+	}
+	if (bird.status == GAME_PAUSED)
+	{
+		window.draw(gui.statistic);
+		window.draw(gui.score);
+		window.draw(gui.gameOver);
+		window.draw(gui.pressR);
 	}
 		
 	window.display();
