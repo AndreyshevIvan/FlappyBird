@@ -100,7 +100,7 @@ void render(sf::RenderWindow &window, const Bird &bird, Background &background, 
 	drawTubes(window, background);
 	drawGround(window, background.ground);
 	if (bird.status == PLAYING)
-		window.draw(gui.pointsText);
+		window.draw(gui.points);
 	window.draw(bird.shape);
 	window.draw(gui.statistic);
 	if (bird.status == NOT_STARTED)

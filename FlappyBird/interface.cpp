@@ -27,12 +27,12 @@ static const float OSCILLATION_AMPLITUDE = 0.12;
 void initializePoints(Interface &gui)
 {
 	sf::Text startPoints("0", gui.pointsFont, FONT_SIZE);
-	gui.pointsText = startPoints;
-	gui.pointsText.setOrigin(gui.pointsText.getCharacterSize() / 4.0, 0);
-	gui.pointsText.setOutlineColor(FONT_OUTLINE_COLOR);
-	gui.pointsText.setOutlineThickness(FONT_THICKNESS);
-	gui.pointsText.setFillColor(sf::Color::White);
-	gui.pointsText.setPosition(POINTS_POS);
+	gui.points = startPoints;
+	gui.points.setOrigin(gui.points.getCharacterSize() / 4.0, 0);
+	gui.points.setOutlineColor(FONT_OUTLINE_COLOR);
+	gui.points.setOutlineThickness(FONT_THICKNESS);
+	gui.points.setFillColor(sf::Color::White);
+	gui.points.setPosition(POINTS_POS);
 	gui.pointsCount = 0;
 }
 
@@ -109,10 +109,10 @@ bool initializeInterface(Interface &gui)
 void centerizatePoints(Interface &gui)
 {
 	if (gui.pointsCount > 9 && gui.pointsCount < 100)
-		gui.pointsText.setOrigin(gui.pointsText.getCharacterSize() / 2.0f, 0);
+		gui.points.setOrigin(gui.points.getCharacterSize() / 2.0f, 0);
 
 	if (gui.pointsCount > 1000)
-		gui.pointsText.setOrigin(gui.pointsText.getCharacterSize() * 0.8f, 0);
+		gui.points.setOrigin(gui.points.getCharacterSize() * 0.8f, 0);
 }
 
 bool addPoint(Interface &gui)
@@ -124,7 +124,7 @@ bool addPoint(Interface &gui)
 
 	centerizatePoints(gui);
 
-	gui.pointsText.setString(toString(gui.pointsCount));
+	gui.points.setString(toString(gui.pointsCount));
 
 	return true;
 }

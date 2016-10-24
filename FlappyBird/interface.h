@@ -7,7 +7,8 @@
 struct Interface
 {
 	sf::Font pointsFont;
-	sf::Text pointsText;
+	sf::Text points;
+	sf::Text resultPoints;
 	int pointsCount;
 	sf::Music pointSound;
 	sf::Music wingSound;
