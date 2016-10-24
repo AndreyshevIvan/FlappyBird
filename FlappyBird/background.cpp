@@ -141,7 +141,8 @@ void moveTubes(const float &moveSpeed, Background &background, Bird &bird, Inter
 		if (background.tubes[tubeNumber][0].getPosition().x <= bird.shape.getPosition().x && !background.tubeStatus[tubeNumber])
 		{
 			background.tubeStatus[tubeNumber] = true;
-			addPoint(gui);
+			if (!addPoint(gui))
+				exit(1);
 		}
 	}
 }

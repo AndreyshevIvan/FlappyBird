@@ -13,9 +13,15 @@ struct Interface
 	sf::Music wingSound;
 	sf::Music failSound;
 	sf::Music tenPointsSound;
-	sf::Music ost;
 	sf::RectangleShape statistic;
+	sf::RectangleShape guide;
+	float guideTimer;
+	sf::RectangleShape gameName;
+	sf::RectangleShape gameOver;
 	sf::Texture statisticTexture;
+	sf::Texture guideTexture;
+	sf::Texture gameNameTexture;
+	sf::Texture gameOverTexture;
 };
 
 template <typename T>
@@ -27,5 +33,13 @@ std::string toString(T val)
 }
 
 bool initializeInterface(Interface &gui);
-int addPoint(Interface &gui);
-bool createSound(Interface &gui);
+bool initializeGuiFiles(Interface &gui);
+void initializePoints(Interface &gui);
+void initializeStatistic(Interface &gui);
+void initializeGuide(Interface &gui);
+void initializeGameName(Interface &gui);
+void initializeGameOver(Interface &gui);
+void initializeSound(Interface &gui);
+bool addPoint(Interface &gui);
+void centerizatePoints(Interface &gui);
+void stayingInterfaceAnimate(float elapsedTime, Interface &gui);

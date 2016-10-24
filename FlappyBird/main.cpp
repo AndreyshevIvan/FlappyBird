@@ -24,8 +24,9 @@ bool startGame(Bird &bird, Background &background, Interface &gui)
 
 void gameOver(Bird &bird, Background &background, Interface &gui)
 {
-	bird.status = GAME_PAUSED;
 	gui.failSound.play();
+	bird.status = GAME_PAUSED;
+	gui.statistic.move(0, RESOLUTION_H / 2.0f + gui.statistic.getSize().y);
 }
 
 void handleEvents(sf::RenderWindow &window, Bird &bird, Background &background, Interface &gui)
@@ -40,6 +41,7 @@ void handleEvents(sf::RenderWindow &window, Bird &bird, Background &background, 
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space && bird.status != GAME_PAUSED)
 		{
 			startJump(bird, gui);
+			bird.status = PLAYING;
 		}
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R && bird.status == GAME_PAUSED)
 		{
@@ -74,11 +76,12 @@ void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, 
 	switch (bird.status)
 	{
 	case NOT_STARTED:
-		animateBird(bird, elapsedTime);
-		moveGround(moveSpeed, background.ground);
+		flappingAnimate(bird, elapsedTime);
+		stayingAnimate(bird, elapsedTime);
+		stayingInterfaceAnimate(elapsedTime, gui);
 		break;
 	case PLAYING:
-		animateBird(bird, elapsedTime);
+		flappingAnimate(bird, elapsedTime);
 		moveGround(moveSpeed, background.ground);
 		birdJump(elapsedTime, bird);
 		moveTubes(moveSpeed, background, bird, gui);
@@ -86,7 +89,6 @@ void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, 
 			gameOver(bird, background, gui);
 		break;
 	case GAME_PAUSED:
-		gui.statistic.move(0, RESOLUTION_H / 2.0f);
 		break;
 	}
 }
@@ -97,9 +99,16 @@ void render(sf::RenderWindow &window, const Bird &bird, Background &background, 
 	window.draw(background.wrapper);
 	drawTubes(window, background);
 	drawGround(window, background.ground);
-	window.draw(gui.pointsText);
+	if (bird.status == PLAYING)
+		window.draw(gui.pointsText);
 	window.draw(bird.shape);
 	window.draw(gui.statistic);
+	if (bird.status == NOT_STARTED)
+	{
+		window.draw(gui.gameName);
+		window.draw(gui.guide);
+	}
+		
 	window.display();
 }
 

@@ -1,12 +1,14 @@
 #pragma once
+#define _USE_MATH_DEFINES
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include "bird.h"
 #include <cmath>
+#include <iostream>
 
 static const sf::Vector2f BIRD_SIZE = { 50 , 35 };
 static const sf::Vector2f BIRD_POSITION = { 80, 320 };
-static const int COLLISION_SHAPE_RADIUS = BIRD_SIZE.y / 2.4f;
+static const int COLLISION_SHAPE_RADIUS = BIRD_SIZE.y / 2.3f;
 
 static const float JUMP_HEIGHT = 70;
 static const float G = 12;
@@ -18,6 +20,7 @@ static const float DOWN_ROT_ANGLE = 90;
 static const float DOWN_ROT_SPEED = 0.9;
 
 static const float FLAPPING_SPEED = 15;
+static const float OSCILLATION_AMPLITUDE = 0.12;
 
 bool initializeBird(Bird &bird)
 {
@@ -31,7 +34,8 @@ bool initializeBird(Bird &bird)
 	bird.shape.setPosition(BIRD_POSITION);
 	bird.status = NOT_STARTED;
 	bird.jumpingVector = { 0, 0, 0 }; // {speed, time, past height}
-	bird.animTime = 0;
+	bird.animTime[0] = 0;
+	bird.animTime[1] = 0;
 
 	bird.collisionShape.setRadius(COLLISION_SHAPE_RADIUS);
 	bird.collisionShape.setOrigin(bird.collisionShape.getGlobalBounds().width / 2.0f, bird.collisionShape.getGlobalBounds().height / 2.0f);
@@ -41,24 +45,28 @@ bool initializeBird(Bird &bird)
 	return true;
 }
 
-void animateBird(Bird &bird, const float &elapsedTime)
+void flappingAnimate(Bird &bird, const float &elapsedTime)
 {
-	bird.animTime += FLAPPING_SPEED * elapsedTime;
-	if ((int)bird.animTime > 2)
-	{
-		bird.animTime = 0;
-	}
-	bird.shape.setTextureRect(sf::IntRect((int)bird.animTime * 34, 0, 34, 24));
+
+	bird.animTime[0] += FLAPPING_SPEED * elapsedTime;
+	if ((int)bird.animTime[0] > 2)
+		bird.animTime[0] = 0;
+	bird.shape.setTextureRect(sf::IntRect((int)bird.animTime[0] * 34, 0, 34, 24));
+}
+
+void stayingAnimate(Bird &bird, const float &elapsedTime)
+{
+	const float PI = float(M_PI);
+
+	bird.animTime[1] += elapsedTime;
+	if (bird.animTime[1] >= 2 * PI)
+		bird.animTime[1] = 0;
+	bird.shape.move(0, OSCILLATION_AMPLITUDE * sin(FLAPPING_SPEED * bird.animTime[1]));
 }
 
 void startJump(Bird &bird, Interface &gui)
 {
 	gui.wingSound.play();
-	if (bird.status != PLAYING)
-	{
-		gui.ost.play();
-		bird.status = PLAYING;
-	}
 	bird.jumpingVector[0] = sqrt((2.0f * JUMP_HEIGHT) / G);
 	bird.jumpingVector[1] = 0;
 	bird.jumpingVector[2] = 0;

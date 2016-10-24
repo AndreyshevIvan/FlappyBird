@@ -27,3 +27,4 @@ void drawGround(sf::RenderWindow &window, sf::RectangleShape ground[]);
 bool inititalizeTubes(Background &background);
 void moveTubes(const float &moveSpeed, Background &background, Bird &bird, Interface &gui);
 void drawTubes(sf::RenderWindow &window, Background &background);
+void guideAnimate(Interface &gui);

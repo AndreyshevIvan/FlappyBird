@@ -16,10 +16,11 @@ struct Bird
 	sf::RectangleShape shape;
 	sf::CircleShape collisionShape;
 	sf::Texture shapeTexture;
-	float animTime;
+	float animTime[2];
 };
 
 bool initializeBird(Bird &bird);
 void startJump(Bird &bird, Interface &gui);
 void birdJump(const float &elapsedTime, Bird &bird);
-void animateBird(Bird &bird, const float &elapsedTime);
+void flappingAnimate(Bird &bird, const float &elapsedTime);
+void stayingAnimate(Bird &bird, const float &elapsedTime);
