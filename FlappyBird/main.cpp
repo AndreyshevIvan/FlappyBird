@@ -10,25 +10,8 @@ static const int RESOLUTION_H = 640;
 
 const float SPEED = 250.f; // pixels per second.
 
-void handleEvents(sf::RenderWindow &window, Bird &bird, Interface &gui)
-{
-	sf::Event event;
-	while (window.pollEvent(event))
-	{
-		if (event.type == sf::Event::Closed)
-		{
-			window.close();
-		}
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
-		{
-			startJump(bird, gui);
-		}
-	}
-}
-
 bool startGame(Bird &bird, Background &background, Interface &gui)
 {
-	srand(time(NULL));
 	if (!initializeBird(bird))
 		return(EXIT_FAILURE);
 	if (!initializeBackground(background))
@@ -39,27 +22,43 @@ bool startGame(Bird &bird, Background &background, Interface &gui)
 	return true;
 }
 
-bool collision(Bird &bird, Background background, Interface &gui)
+void gameOver(Bird &bird, Background &background, Interface &gui)
 {
-	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
+	bird.status = GAME_PAUSED;
+	gui.failSound.play();
+}
+
+void handleEvents(sf::RenderWindow &window, Bird &bird, Background &background, Interface &gui)
+{
+	sf::Event event;
+	while (window.pollEvent(event))
 	{
-		if (bird.collisionShape.getGlobalBounds().intersects(background.ground[groundNumber].getGlobalBounds()))
+		if (event.type == sf::Event::Closed)
 		{
-			gui.failSound.play();
-			return true;
+			window.close();
+		}
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space && bird.status != GAME_PAUSED)
+		{
+			startJump(bird, gui);
+		}
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R && bird.status == GAME_PAUSED)
+		{
+			startGame(bird, background, gui);
 		}
 	}
+}
 
-	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
+bool collision(Bird &bird, Background background, Interface &gui)
+{
+	for (int number = 0; number < GROUNDS_COUNT; number++)
 	{
-		if (
-			bird.collisionShape.getGlobalBounds().intersects(background.tubes[tubeNumber][0].getGlobalBounds()) ||
-			bird.collisionShape.getGlobalBounds().intersects(background.tubes[tubeNumber][1].getGlobalBounds())
-			)
-			{
-			gui.failSound.play();
+		if 
+		(
+		bird.collisionShape.getGlobalBounds().intersects(background.tubes[number][0].getGlobalBounds()) ||
+		bird.collisionShape.getGlobalBounds().intersects(background.tubes[number][1].getGlobalBounds()) ||
+		bird.collisionShape.getGlobalBounds().intersects(background.ground[number].getGlobalBounds())
+		)
 			return true;
-			}
 	}
 
 	return false;
@@ -68,38 +67,27 @@ bool collision(Bird &bird, Background background, Interface &gui)
 void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, Bird &bird, Interface &gui)
 {
 	const float elapsedTime = clock.getElapsedTime().asSeconds();
-	float moveSpeed = SPEED * elapsedTime;
+	const float moveSpeed = SPEED * elapsedTime;
+
 	clock.restart();
 
-	if (collision(bird, background, gui))
+	switch (bird.status)
 	{
-		bird.jumping = GAME_PAUSED;
-	}
-
-	if (bird.jumping == GAME_PAUSED)
-	{
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
-			{
-				startGame(bird, background, gui);
-			}
-		}
-	}
-	else
-	{
+	case NOT_STARTED:
 		animateBird(bird, elapsedTime);
-		if (bird.jumping == STARTED)
-		{
-			birdJump(elapsedTime, bird);
-			moveTubes(moveSpeed, background, bird, gui);
-		}
 		moveGround(moveSpeed, background.ground);
+		break;
+	case PLAYING:
+		animateBird(bird, elapsedTime);
+		moveGround(moveSpeed, background.ground);
+		birdJump(elapsedTime, bird);
+		moveTubes(moveSpeed, background, bird, gui);
+		if (collision(bird, background, gui))
+			gameOver(bird, background, gui);
+		break;
+	case GAME_PAUSED:
+		gui.statistic.move(0, RESOLUTION_H / 2.0f);
+		break;
 	}
 }
 
@@ -111,6 +99,7 @@ void render(sf::RenderWindow &window, const Bird &bird, Background &background, 
 	drawGround(window, background.ground);
 	window.draw(gui.pointsText);
 	window.draw(bird.shape);
+	window.draw(gui.statistic);
 	window.display();
 }
 
@@ -122,14 +111,14 @@ int main()
 	Bird bird;
 	Background background;
 	Interface gui;
-
-	startGame(bird, background, gui);
-
 	sf::Clock clock;
+
+	srand(time(NULL));
+	startGame(bird, background, gui);
 
 	while (window.isOpen())
 	{
-		handleEvents(window, bird, gui);
+		handleEvents(window, bird, background, gui);
 		update(window, clock, background, bird, gui);
 		render(window, bird, background, gui);
 	}

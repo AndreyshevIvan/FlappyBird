@@ -2,16 +2,16 @@
 #include <SFML/Graphics.hpp>
 #include "interface.h"
 
-enum Jumping
+enum GameStatus
 {
-	STARTED,
+	PLAYING,
 	NOT_STARTED,
 	GAME_PAUSED
 };
 
 struct Bird
 {
-	Jumping jumping;
+	GameStatus status;
 	std::vector<float> jumpingVector; // {speed, time, past height}
 	sf::RectangleShape shape;
 	sf::CircleShape collisionShape;

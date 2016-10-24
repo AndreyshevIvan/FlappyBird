@@ -15,8 +15,8 @@ static const sf::Vector2f WRAPPER_POS = { 0, RESOLUTION_H - GROUND_SIZE.y - WRAP
 
 static const sf::Vector2f TUBE_SIZE = { 52, 400 };
 static const float TUBES_OFFSET = 220;
-static const float INIT_OFFSET = 750;
-static const float TUBE_GAP = 180;
+static const float INIT_OFFSET = 730;
+static const float TUBE_GAP = 150;
 static const float VERTICAL_OFFSET = 60;
 static const int MIN_TUBE_HEIGHT = TUBE_GAP + VERTICAL_OFFSET;
 static const int MAX_TUBE_HEIGHT = RESOLUTION_H - GROUND_SIZE.y - VERTICAL_OFFSET;
@@ -98,7 +98,7 @@ void drawGround(sf::RenderWindow &window, sf::RectangleShape ground[])
 	}
 }
 
-void moveGround(float &moveSpeed, sf::RectangleShape ground[])
+void moveGround(const float &moveSpeed, sf::RectangleShape ground[])
 {
 	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
 	{
@@ -117,7 +117,7 @@ void drawTubes(sf::RenderWindow &window, Background &background)
 	}
 }
 
-void moveTubes(float &moveSpeed, Background &background, Bird &bird, Interface &gui)
+void moveTubes(const float &moveSpeed, Background &background, Bird &bird, Interface &gui)
 {
 	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
 	{

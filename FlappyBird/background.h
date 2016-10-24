@@ -22,8 +22,8 @@ struct Background
 bool initializeBackground(Background &background);
 bool inititalizeWrapper(Background &background);
 bool inititalizeGround(Background &background);
-void moveGround(float &moveSpeed, sf::RectangleShape ground[]);
+void moveGround(const float &moveSpeed, sf::RectangleShape ground[]);
 void drawGround(sf::RenderWindow &window, sf::RectangleShape ground[]);
 bool inititalizeTubes(Background &background);
-void moveTubes(float &moveSpeed, Background &background, Bird &bird, Interface &gui);
+void moveTubes(const float &moveSpeed, Background &background, Bird &bird, Interface &gui);
 void drawTubes(sf::RenderWindow &window, Background &background);

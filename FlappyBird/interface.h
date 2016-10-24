@@ -14,6 +14,8 @@ struct Interface
 	sf::Music failSound;
 	sf::Music tenPointsSound;
 	sf::Music ost;
+	sf::RectangleShape statistic;
+	sf::Texture statisticTexture;
 };
 
 template <typename T>
