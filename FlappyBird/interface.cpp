@@ -13,7 +13,8 @@ static const int FONT_SIZE = 40;
 static const sf::Vector2f POINTS_POS = { RESOLUTION_W / 2.0f, 20 };
 static const int FONT_THICKNESS = 4;
 static const sf::Color FONT_OUTLINE_COLOR = sf::Color(84, 56, 71);
-static const int POINTS_TO_WIN = 100;
+
+static const int POINTS_TO_WIN = 1000;
 
 static const sf::Vector2f STATISTIC_SIZE = { 300, 150 };
 static const sf::Vector2f STATISTIC_POS = { RESOLUTION_W / 2.0f, RESOLUTION_H / 2.0f };
