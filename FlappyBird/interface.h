@@ -27,4 +27,3 @@ std::string toString(T val)
 bool initializeInterface(Interface &gui);
 int addPoint(Interface &gui);
 bool createSound(Interface &gui);
-void gameOverMenu(sf::RenderWindow &window, Interface &gui);

@@ -5,7 +5,8 @@
 enum Jumping
 {
 	STARTED,
-	NOT_STARTED
+	NOT_STARTED,
+	GAME_PAUSED
 };
 
 struct Bird

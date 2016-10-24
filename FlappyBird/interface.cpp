@@ -1,7 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "interface.h"
 #include "background.h"
+#include "interface.h"
+#include <iostream>
 
 static const float RESOLUTION_W = 480;
 
@@ -63,27 +64,4 @@ bool createSound(Interface &gui)
 	gui.ost.setVolume(30);
 
 	return true;
-}
-
-void gameOverMenu(sf::RenderWindow &window, Interface &gui)
-{
-	bool continueFlag = false;
-	while (!continueFlag)
-	{
-		gui.ost.stop();
-		sf::Event event;
-
-		while (!window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-			{
-				window.close();
-				exit(1);
-			}
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
-			{
-				
-			}
-		}
-	}
 }

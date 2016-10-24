@@ -73,7 +73,7 @@ void birdJump(const float &elapsedTime, Bird &bird)
 
 	bird.jumpingVector[2] = height = speed * time - 0.5f * G * pow(time, 2.0f);
 	movement = pastHeight - height;
-	if (bird.shape.getPosition().y < -300)
+	if (bird.shape.getPosition().y < -BIRD_SIZE.y)
 	{
 		bird.shape.setPosition(BIRD_POSITION.x, -BIRD_SIZE.y);
 	}

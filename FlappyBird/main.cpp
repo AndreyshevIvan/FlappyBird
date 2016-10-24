@@ -3,6 +3,7 @@
 #include "bird.h"
 #include "background.h"
 #include "interface.h"
+#include <iostream>
 
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
@@ -55,10 +56,10 @@ bool collision(Bird &bird, Background background, Interface &gui)
 			bird.collisionShape.getGlobalBounds().intersects(background.tubes[tubeNumber][0].getGlobalBounds()) ||
 			bird.collisionShape.getGlobalBounds().intersects(background.tubes[tubeNumber][1].getGlobalBounds())
 			)
-		{
+			{
 			gui.failSound.play();
 			return true;
-		}
+			}
 	}
 
 	return false;
@@ -71,16 +72,35 @@ void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, 
 	clock.restart();
 
 	if (collision(bird, background, gui))
-		gameOverMenu(window, gui);
-
-	animateBird(bird, elapsedTime);
-
-	if (bird.jumping == STARTED)
 	{
-		birdJump(elapsedTime, bird);
-		moveTubes(moveSpeed, background, bird, gui);
+		bird.jumping = GAME_PAUSED;
 	}
-	moveGround(moveSpeed, background.ground);
+
+	if (bird.jumping == GAME_PAUSED)
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+			{
+				startGame(bird, background, gui);
+			}
+		}
+	}
+	else
+	{
+		animateBird(bird, elapsedTime);
+		if (bird.jumping == STARTED)
+		{
+			birdJump(elapsedTime, bird);
+			moveTubes(moveSpeed, background, bird, gui);
+		}
+		moveGround(moveSpeed, background.ground);
+	}
 }
 
 void render(sf::RenderWindow &window, const Bird &bird, Background &background, Interface &gui)
