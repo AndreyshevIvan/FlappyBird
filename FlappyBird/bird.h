@@ -12,7 +12,7 @@ enum GameStatus
 struct Bird
 {
 	GameStatus status;
-	std::vector<float> jumpingVector; // {speed, time, past height}
+	std::vector<float> jumpingVector; // {time, past height}
 	sf::RectangleShape shape;
 	sf::CircleShape collisionShape;
 	sf::Texture shapeTexture;
@@ -20,6 +20,8 @@ struct Bird
 };
 
 bool initializeBird(Bird &bird);
+bool initializeBody(Bird &bird);
+void initializeCollisionShape(Bird &bird);
 void startJump(Bird &bird, Interface &gui);
 void birdJump(const float &elapsedTime, Bird &bird);
 void flappingAnimate(Bird &bird, const float &elapsedTime);

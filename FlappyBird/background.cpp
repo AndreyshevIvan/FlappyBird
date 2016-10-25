@@ -8,16 +8,19 @@ static const float RESOLUTION_W = 480;
 static const float RESOLUTION_H = 640;
 
 static const sf::Vector2f GROUND_SIZE = { RESOLUTION_W, 70 };
-static const sf::Vector2f GROUND_POS = { 0, RESOLUTION_H - GROUND_SIZE.y };
-static const sf::Vector2f GROUND_OFFSET = { 446, 0 };
-static const sf::Vector2f WRAPPER_SIZE = { RESOLUTION_W, 125 };
-static const sf::Vector2f WRAPPER_POS = { 0, RESOLUTION_H - GROUND_SIZE.y - WRAPPER_SIZE.y };
-
 static const sf::Vector2f TUBE_SIZE = { 52, 400 };
-static const float TUBES_OFFSET = 220;
-static const float INIT_OFFSET = 730;
-static const float TUBE_GAP = 150;
+static const sf::Vector2f WRAPPER_SIZE = { RESOLUTION_W, 125 };
+
+static const float GROUND_OFFSET = 446;
+static const float TUBES_OFFSET = RESOLUTION_W / 2.0f;
+static const float INIT_OFFSET = RESOLUTION_W + 200;
 static const float VERTICAL_OFFSET = 60;
+
+static const sf::Vector2f WRAPPER_POS = { 0, RESOLUTION_H - GROUND_SIZE.y - WRAPPER_SIZE.y };
+static const sf::Vector2f GROUND_POS = { 0, RESOLUTION_H - GROUND_SIZE.y };
+
+static const float TUBE_GAP = 150;
+
 static const int MIN_TUBE_HEIGHT = TUBE_GAP + VERTICAL_OFFSET;
 static const int MAX_TUBE_HEIGHT = RESOLUTION_H - GROUND_SIZE.y - VERTICAL_OFFSET;
 
@@ -40,7 +43,7 @@ bool inititalizeGround(Background &background)
 	{
 		background.ground[groundNumber] = sf::RectangleShape(GROUND_SIZE);
 		background.ground[groundNumber].setTexture(&background.groundTexture);
-		background.ground[groundNumber].setPosition(GROUND_OFFSET.x * groundNumber, GROUND_POS.y);
+		background.ground[groundNumber].setPosition(GROUND_OFFSET * groundNumber, GROUND_POS.y);
 	}
 
 	return true;
@@ -61,8 +64,8 @@ bool inititalizeTubes(Background &background)
 
 		bottomTube = sf::RectangleShape(TUBE_SIZE);
 		bottomTube.setTexture(&background.tubeTextureBottom);
-		bottomTube.setOrigin(bottomTube.getGlobalBounds().width / 2.0f, 0);
-		bottomTube.setPosition(RESOLUTION_W + INIT_OFFSET + tubesNumber * TUBES_OFFSET, randomHeight);
+		bottomTube.setOrigin(TUBE_SIZE.x / 2.0f, 0);
+		bottomTube.setPosition(INIT_OFFSET + tubesNumber * TUBES_OFFSET, randomHeight);
 
 		topTube = bottomTube;
 		topTube.rotate(180);
@@ -78,11 +81,7 @@ bool inititalizeTubes(Background &background)
 
 bool initializeBackground(Background &background)
 {
-	if (
-		!inititalizeWrapper(background) || 
-		!inititalizeGround(background) ||
-		!inititalizeTubes(background)
-		)
+	if (!inititalizeWrapper(background) || !inititalizeGround(background) || !inititalizeTubes(background))
 		return false;
 	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
 		background.tubeStatus[tubeNumber] = false;
@@ -93,9 +92,7 @@ bool initializeBackground(Background &background)
 void drawGround(sf::RenderWindow &window, sf::RectangleShape ground[])
 {
 	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
-	{
 		window.draw(ground[groundNumber]);
-	}
 }
 
 void moveGround(const float &moveSpeed, sf::RectangleShape ground[])
@@ -103,7 +100,7 @@ void moveGround(const float &moveSpeed, sf::RectangleShape ground[])
 	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
 	{
 		if (ground[groundNumber].getPosition().x + GROUND_SIZE.x <= 0)
-			ground[groundNumber].setPosition(ground[groundNumber].getPosition().x + (GROUND_OFFSET.x * GROUNDS_COUNT), GROUND_POS.y);
+			ground[groundNumber].setPosition(ground[groundNumber].getPosition().x + (GROUND_OFFSET * GROUNDS_COUNT), GROUND_POS.y);
 		ground[groundNumber].move(-moveSpeed, 0);
 	}
 }
@@ -117,7 +114,7 @@ void drawTubes(sf::RenderWindow &window, Background &background)
 	}
 }
 
-void moveTubes(const float &moveSpeed, Background &background, Bird &bird, Interface &gui)
+void moveTubes(const float &moveSpeed, Background &background)
 {
 	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
 	{
@@ -128,7 +125,7 @@ void moveTubes(const float &moveSpeed, Background &background, Bird &bird, Inter
 			int randomHeight = rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT) + MIN_TUBE_HEIGHT;
 
 			bottomTube.setPosition(bottomTube.getPosition().x + (TUBES_OFFSET * TUBES_COUNT), randomHeight);
-			topTube.setPosition(topTube.getPosition().x + (TUBES_OFFSET * TUBES_COUNT), bottomTube.getPosition().y - TUBE_GAP);
+			topTube.setPosition(bottomTube.getPosition().x, bottomTube.getPosition().y - TUBE_GAP);
 
 			background.tubes[tubeNumber][0].setPosition(bottomTube.getPosition());
 			background.tubes[tubeNumber][1].setPosition(topTube.getPosition());
@@ -137,12 +134,5 @@ void moveTubes(const float &moveSpeed, Background &background, Bird &bird, Inter
 		}
 		background.tubes[tubeNumber][0].move(-moveSpeed, 0);
 		background.tubes[tubeNumber][1].move(-moveSpeed, 0);
-
-		if (background.tubes[tubeNumber][0].getPosition().x <= bird.shape.getPosition().x && !background.tubeStatus[tubeNumber])
-		{
-			background.tubeStatus[tubeNumber] = true;
-			if (!addPoint(gui))
-				exit(1);
-		}
 	}
 }

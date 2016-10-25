@@ -9,98 +9,29 @@
 static const float RESOLUTION_W = 480;
 static const float RESOLUTION_H = 640;
 
-static const int FONT_SIZE = 40;
-static const sf::Vector2f POINTS_POS = { RESOLUTION_W / 2.0f, 20 };
-static const int FONT_THICKNESS = 4;
-static const sf::Color FONT_OUTLINE_COLOR = sf::Color(84, 56, 71);
-
-static const int POINTS_TO_WIN = 1000;
-
 static const sf::Vector2f STATISTIC_SIZE = { 300, 150 };
-static const sf::Vector2f STATISTIC_POS = { RESOLUTION_W / 2.0f, RESOLUTION_H / 2.0f };
 static const sf::Vector2f GUIDE_SIZE = { 150, 156 };
-static const sf::Vector2f GUIDE_POSITION = { 120, 325 };
 static const sf::Vector2f GAME_NAME_SIZE = { 250, 67 };
 static const sf::Vector2f GAME_OVER_SIZE = { 192, 42 };
 
-static const sf::Vector2f SCORE_POS = { RESOLUTION_W  / 2.0f + 70, RESOLUTION_H / 2.0f - 34};
-static const int SCORE_SIZE = 30;
+static const sf::Vector2f STATISTIC_POS = { RESOLUTION_W / 2.0f, RESOLUTION_H / 2.0f };
+static const sf::Vector2f GUIDE_POS = { 120, 325 };
+static const sf::Vector2f POINTS_POS = { RESOLUTION_W / 2.0f, 20 };
+static const sf::Vector2f SCORE_POS = { (RESOLUTION_W + STATISTIC_SIZE.x) / 2.0f - 25, RESOLUTION_H / 2.0f - STATISTIC_SIZE.y / 4.3f};
+static const sf::Vector2f FONT_PRESS_R_POS = { RESOLUTION_W / 2.0f, STATISTIC_POS.y + 90 };
 
-static const int PRESS_R_SIZE = 20;
+static const int FONT_POINTS_SIZE = 40;
+static const int FONT_SCORE_SIZE = 30;
+static const int FONT_PRESS_R_SIZE = 18;
+static const int FONT_OUTLINE_THICKNESS = 4;
+static const int FONT_OUTLINE_THICKNESS_PRESS_R = 2;
+static const sf::Color FONT_COLOR = sf::Color(250, 250, 250);
+static const sf::Color FONT_OUTLINE_COLOR = sf::Color(92, 53, 70);
 
 static const float FLAPPING_SPEED = 15;
 static const float OSCILLATION_AMPLITUDE = 0.12;
 
-
-void initializePoints(Interface &gui) 
-{
-	sf::Text startPoints("0", gui.pointsFont, FONT_SIZE);
-	gui.points = startPoints;
-	gui.points.setOrigin(gui.points.getCharacterSize() / 4.0, 0);
-	gui.points.setOutlineColor(FONT_OUTLINE_COLOR);
-	gui.points.setOutlineThickness(FONT_THICKNESS);
-	gui.points.setFillColor(sf::Color::White);
-	gui.points.setPosition(POINTS_POS);
-	gui.pointsCount = 0;
-}
-
-void initializeScore(Interface &gui)
-{
-	sf::Text startPoints("0", gui.pointsFont, SCORE_SIZE);
-
-	gui.score = startPoints;
-	gui.score.setOrigin(gui.score.getCharacterSize() / 4.0, 0);
-	gui.score.setOutlineColor(FONT_OUTLINE_COLOR);
-	gui.score.setOutlineThickness(FONT_THICKNESS);
-	gui.score.setFillColor(sf::Color::White);
-	gui.score.setPosition(SCORE_POS);
-	gui.score.setString(toString(gui.pointsCount));
-}
-
-void initializePressR(Interface &gui)
-{
-	sf::Text startPoints("PRESS 'R' TO RESTART", gui.pointsFont, PRESS_R_SIZE);
-
-	gui.pressR = startPoints;
-	gui.pressR.setOrigin(100, 0);
-	gui.pressR.setOutlineColor(FONT_OUTLINE_COLOR);
-	gui.pressR.setOutlineThickness(FONT_THICKNESS);
-	gui.pressR.setFillColor(sf::Color::White);
-	gui.pressR.setPosition(RESOLUTION_W / 2.0f, gui.statistic.getPosition().y + 100);
-}
-
-void initializeStatistic(Interface &gui)
-{
-	gui.statistic.setSize(STATISTIC_SIZE);
-	gui.statistic.setOrigin(gui.statistic.getGlobalBounds().width / 2.0f, gui.statistic.getGlobalBounds().height / 2.0f);
-	gui.statistic.setPosition(RESOLUTION_W / 2.0f, RESOLUTION_H / 2.0f);
-	gui.statistic.setTexture(&gui.statisticTexture);
-}
-
-void initializeGuide(Interface &gui)
-{
-	gui.guide.setSize(GUIDE_SIZE);
-	gui.guide.setOrigin(0, gui.guide.getGlobalBounds().height / 2.0f);
-	gui.guide.setPosition(GUIDE_POSITION);
-	gui.guide.setTexture(&gui.guideTexture);
-	gui.guideTimer = 0;
-}
-
-void initializeGameName(Interface &gui)
-{
-	gui.gameName.setSize(GAME_NAME_SIZE);
-	gui.gameName.setOrigin(gui.gameName.getGlobalBounds().width / 2.0f, gui.gameName.getGlobalBounds().height / 2.0f);
-	gui.gameName.setPosition(RESOLUTION_W / 2.0f, 100);
-	gui.gameName.setTexture(&gui.gameNameTexture);
-}
-
-void initializeGameOver(Interface &gui)
-{
-	gui.gameOver.setSize(GAME_OVER_SIZE);
-	gui.gameOver.setOrigin(gui.gameOver.getGlobalBounds().width / 2.0f, gui.gameOver.getGlobalBounds().height / 2.0f);
-	gui.gameOver.setPosition(RESOLUTION_W / 2.0f, gui.statistic.getPosition().y - gui.statistic.getGlobalBounds().height);
-	gui.gameOver.setTexture(&gui.gameOverTexture);
-}
+static const int POINTS_TO_WIN = 1000;
 
 bool initializeGuiFiles(Interface &gui)
 {
@@ -124,6 +55,76 @@ bool initializeGuiFiles(Interface &gui)
 	return true;
 }
 
+void initializePoints(Interface &gui) 
+{
+	sf::Text startPoints("0", gui.pointsFont, FONT_POINTS_SIZE);
+	gui.points = startPoints;
+	gui.points.setOutlineColor(FONT_OUTLINE_COLOR);
+	gui.points.setOutlineThickness(FONT_OUTLINE_THICKNESS);
+	gui.points.setFillColor(FONT_COLOR);
+	gui.points.setOrigin(gui.points.getGlobalBounds().width / 2.0f, 0);
+	gui.points.setPosition(POINTS_POS);
+	gui.pointsCount = 0;
+}
+
+void initializeScore(Interface &gui)
+{
+	sf::Text startPoints("0", gui.pointsFont, FONT_SCORE_SIZE);
+
+	gui.score = startPoints;
+	gui.score.setOutlineColor(FONT_OUTLINE_COLOR);
+	gui.score.setOutlineThickness(FONT_OUTLINE_THICKNESS);
+	gui.score.setFillColor(FONT_COLOR);
+	gui.score.setString(toString(gui.pointsCount));
+	gui.score.setOrigin(gui.score.getGlobalBounds().width, 0);
+	gui.score.setPosition(SCORE_POS);
+}
+
+void initializePressR(Interface &gui)
+{
+	sf::Text startPoints("PRESS 'R' TO RESTART", gui.pointsFont, FONT_PRESS_R_SIZE);
+
+	gui.pressR = startPoints;
+	gui.pressR.setOutlineColor(FONT_OUTLINE_COLOR);
+	gui.pressR.setOutlineThickness(FONT_OUTLINE_THICKNESS_PRESS_R);
+	gui.pressR.setFillColor(FONT_COLOR);
+	gui.pressR.setOrigin(gui.pressR.getGlobalBounds().width / 2.0f, 0);
+	gui.pressR.setPosition(FONT_PRESS_R_POS);
+}
+
+void initializeStatistic(Interface &gui)
+{
+	gui.statistic.setSize(STATISTIC_SIZE);
+	gui.statistic.setTexture(&gui.statisticTexture);
+	gui.statistic.setOrigin(STATISTIC_SIZE.x / 2.0f, STATISTIC_SIZE.y / 2.0f);
+	gui.statistic.setPosition(RESOLUTION_W / 2.0f, RESOLUTION_H / 2.0f);
+}
+
+void initializeGuide(Interface &gui)
+{
+	gui.guide.setSize(GUIDE_SIZE);
+	gui.guide.setTexture(&gui.guideTexture);
+	gui.guide.setOrigin(0, gui.guide.getGlobalBounds().height / 2.0f);
+	gui.guide.setPosition(GUIDE_POS);
+	gui.guideTimer = 0;
+}
+
+void initializeGameName(Interface &gui)
+{
+	gui.gameName.setSize(GAME_NAME_SIZE);
+	gui.gameName.setOrigin(GAME_NAME_SIZE.x / 2.0f, GAME_NAME_SIZE.y / 2.0f);
+	gui.gameName.setPosition(RESOLUTION_W / 2.0f, 100);
+	gui.gameName.setTexture(&gui.gameNameTexture);
+}
+
+void initializeGameOver(Interface &gui)
+{
+	gui.gameOver.setSize(GAME_OVER_SIZE);
+	gui.gameOver.setOrigin(GAME_OVER_SIZE.x / 2.0f, GAME_OVER_SIZE.y / 2.0f);
+	gui.gameOver.setPosition(RESOLUTION_W / 2.0f, STATISTIC_POS.y - STATISTIC_SIZE.y);
+	gui.gameOver.setTexture(&gui.gameOverTexture);
+}
+
 bool initializeInterface(Interface &gui)
 {
 	if (!initializeGuiFiles(gui))
@@ -140,15 +141,6 @@ bool initializeInterface(Interface &gui)
 	return true;
 }
 
-void centerizatePoints(Interface &gui)
-{
-	if (gui.pointsCount > 9 && gui.pointsCount < 100)
-		gui.points.setOrigin(gui.points.getCharacterSize() / 2.0f, 0);
-
-	if (gui.pointsCount > 1000)
-		gui.points.setOrigin(gui.points.getCharacterSize() * 0.8f, 0);
-}
-
 bool addPoint(Interface &gui)
 {
 	gui.pointsCount += 1;
@@ -156,9 +148,9 @@ bool addPoint(Interface &gui)
 	if (gui.pointsCount > POINTS_TO_WIN)
 		return false;
 
-	centerizatePoints(gui);
-
 	gui.points.setString(toString(gui.pointsCount));
+	gui.points.setOrigin(gui.points.getGlobalBounds().width / 2.0f, 0);
+	gui.points.setPosition(POINTS_POS);
 
 	return true;
 }

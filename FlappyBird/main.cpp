@@ -13,11 +13,11 @@ const float SPEED = 250.f; // pixels per second.
 bool startGame(Bird &bird, Background &background, Interface &gui)
 {
 	if (!initializeBird(bird))
-		return(EXIT_FAILURE);
+		exit(1);
 	if (!initializeBackground(background))
-		return EXIT_FAILURE;
+		exit(1);
 	if (!initializeInterface(gui))
-		return EXIT_FAILURE;
+		exit(1);
 
 	return true;
 }
@@ -28,18 +28,16 @@ void handleEvents(sf::RenderWindow &window, Bird &bird, Background &background, 
 	while (window.pollEvent(event))
 	{
 		if (event.type == sf::Event::Closed)
-		{
 			window.close();
-		}
+
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space && bird.status != GAME_PAUSED)
 		{
 			startJump(bird, gui);
 			bird.status = PLAYING;
 		}
+
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R && bird.status == GAME_PAUSED)
-		{
 			startGame(bird, background, gui);
-		}
 	}
 }
 
@@ -57,6 +55,18 @@ bool collision(Bird &bird, Background background, Interface &gui)
 	}
 
 	return false;
+}
+
+void isTubeChecked(Bird &bird, Background &background, Interface &gui)
+{
+	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
+	{
+		if (background.tubes[tubeNumber][0].getPosition().x <= bird.shape.getPosition().x && !background.tubeStatus[tubeNumber])
+		{
+			background.tubeStatus[tubeNumber] = true;
+			addPoint(gui);
+		}
+	}
 }
 
 void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, Bird &bird, Interface &gui)
@@ -77,7 +87,8 @@ void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, 
 		flappingAnimate(bird, elapsedTime);
 		moveGround(moveSpeed, background.ground);
 		birdJump(elapsedTime, bird);
-		moveTubes(moveSpeed, background, bird, gui);
+		moveTubes(moveSpeed, background);
+		isTubeChecked(bird, background, gui);
 		if (collision(bird, background, gui))
 		{
 			gui.failSound.play();
@@ -96,22 +107,24 @@ void render(sf::RenderWindow &window, const Bird &bird, Background &background, 
 	window.draw(background.wrapper);
 	drawTubes(window, background);
 	drawGround(window, background.ground);
-	if (bird.status == PLAYING)
-		window.draw(gui.points);
 	window.draw(bird.shape);
-	if (bird.status == NOT_STARTED)
+	//window.draw(bird.collisionShape);
+	switch (bird.status)
 	{
+	case NOT_STARTED:
 		window.draw(gui.gameName);
 		window.draw(gui.guide);
-	}
-	if (bird.status == GAME_PAUSED)
-	{
+		break;
+	case PLAYING:
+		window.draw(gui.points);
+		break;
+	case GAME_PAUSED:
 		window.draw(gui.statistic);
 		window.draw(gui.score);
 		window.draw(gui.gameOver);
 		window.draw(gui.pressR);
+		break;
 	}
-		
 	window.display();
 }
 

@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <iostream>
 #include <sstream>
 
 struct Interface
@@ -10,20 +9,20 @@ struct Interface
 	sf::Text points;
 	sf::Text score;
 	sf::Text pressR;
-	int pointsCount;
 	sf::Music pointSound;
 	sf::Music wingSound;
 	sf::Music failSound;
 	sf::Music tenPointsSound;
 	sf::RectangleShape statistic;
 	sf::RectangleShape guide;
-	float guideTimer;
 	sf::RectangleShape gameName;
 	sf::RectangleShape gameOver;
 	sf::Texture statisticTexture;
 	sf::Texture guideTexture;
 	sf::Texture gameNameTexture;
 	sf::Texture gameOverTexture;
+	int pointsCount;
+	float guideTimer;
 };
 
 template <typename T>
@@ -45,5 +44,4 @@ void initializeGameName(Interface &gui);
 void initializeGameOver(Interface &gui);
 void initializeSound(Interface &gui);
 bool addPoint(Interface &gui);
-void centerizatePoints(Interface &gui);
 void stayingInterfaceAnimate(float elapsedTime, Interface &gui);
