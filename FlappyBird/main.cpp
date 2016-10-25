@@ -3,14 +3,13 @@
 #include "bird.h"
 #include "background.h"
 #include "interface.h"
-#include <iostream>
 
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
 
 const float SPEED = 250.f; // pixels per second.
 
-bool startGame(Bird &bird, Background &background, Interface &gui)
+bool initializeGame(Bird &bird, Background &background, Interface &gui)
 {
 	if (!initializeBird(bird))
 		exit(1);
@@ -37,20 +36,21 @@ void handleEvents(sf::RenderWindow &window, Bird &bird, Background &background, 
 		}
 
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R && bird.status == GAME_PAUSED)
-			startGame(bird, background, gui);
+			initializeGame(bird, background, gui);
 	}
 }
 
-bool collision(Bird &bird, Background background, Interface &gui)
+bool collision(Bird &bird, Background background)
 {
+	auto collisionShape = bird.collisionShape.getGlobalBounds();
 	for (int number = 0; number < GROUNDS_COUNT; number++)
 	{
-		if 
-		(
-		bird.collisionShape.getGlobalBounds().intersects(background.tubes[number][0].getGlobalBounds()) ||
-		bird.collisionShape.getGlobalBounds().intersects(background.tubes[number][1].getGlobalBounds()) ||
-		bird.collisionShape.getGlobalBounds().intersects(background.ground[number].getGlobalBounds())
-		)
+		if
+			(
+				collisionShape.intersects(background.tubes[number][0].getGlobalBounds()) ||
+				collisionShape.intersects(background.tubes[number][1].getGlobalBounds()) ||
+				collisionShape.intersects(background.ground[number].getGlobalBounds())
+				)
 			return true;
 	}
 
@@ -69,7 +69,7 @@ void isTubeChecked(Bird &bird, Background &background, Interface &gui)
 	}
 }
 
-void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, Bird &bird, Interface &gui)
+void update(sf::Clock &clock, Background &background, Bird &bird, Interface &gui)
 {
 	const float elapsedTime = clock.getElapsedTime().asSeconds();
 	const float moveSpeed = SPEED * elapsedTime;
@@ -89,7 +89,7 @@ void update(sf::RenderWindow &window, sf::Clock &clock, Background &background, 
 		birdJump(elapsedTime, bird);
 		moveTubes(moveSpeed, background);
 		isTubeChecked(bird, background, gui);
-		if (collision(bird, background, gui))
+		if (collision(bird, background))
 		{
 			gui.failSound.play();
 			initializeScore(gui);
@@ -108,7 +108,6 @@ void render(sf::RenderWindow &window, const Bird &bird, Background &background, 
 	drawTubes(window, background);
 	drawGround(window, background.ground);
 	window.draw(bird.shape);
-	//window.draw(bird.collisionShape);
 	switch (bird.status)
 	{
 	case NOT_STARTED:
@@ -138,13 +137,13 @@ int main()
 	Interface gui;
 	sf::Clock clock;
 
-	srand(time(NULL));
-	startGame(bird, background, gui);
+	srand((unsigned)time(NULL));
+	initializeGame(bird, background, gui);
 
 	while (window.isOpen())
 	{
 		handleEvents(window, bird, background, gui);
-		update(window, clock, background, bird, gui);
+		update(clock, background, bird, gui);
 		render(window, bird, background, gui);
 	}
 

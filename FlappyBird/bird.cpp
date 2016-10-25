@@ -4,11 +4,10 @@
 #include <SFML/Audio.hpp>
 #include "bird.h"
 #include <cmath>
-#include <iostream>
 
 static const sf::Vector2f BIRD_SIZE = { 50 , 35 };
 static const sf::Vector2f BIRD_POSITION = { 80, 320 };
-static const int COLLISION_SHAPE_RADIUS = BIRD_SIZE.y / 2.3f;
+static const float COLLISION_SHAPE_RADIUS = BIRD_SIZE.y / 2.3f;
 
 static const float G = 12;
 static const float JUMP_HEIGHT = 70;
@@ -21,12 +20,12 @@ static const float DOWN_ROT_ANGLE = 90;
 static const float DOWN_ROT_SPEED = 280;
 
 static const float FLAPPING_SPEED = 15;
-static const float OSCILLATION_AMPLITUDE = 0.12;
+static const float OSCILLATION_AMPLITUDE = 0.12f;
 
 bool initializeBody(Bird &bird)
 {
 	bird.shape.setSize(BIRD_SIZE);
-	if (!bird.shapeTexture.loadFromFile("resources/MainHero.png"))
+	if (!bird.shapeTexture.loadFromFile("resources/mainHero.png"))
 		return false;
 	bird.shape.setTexture(&bird.shapeTexture);
 	bird.shape.setTextureRect(sf::IntRect(40, 0, 40, 28));

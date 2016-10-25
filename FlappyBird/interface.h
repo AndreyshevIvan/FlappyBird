@@ -34,7 +34,7 @@ std::string toString(T val)
 }
 
 bool initializeInterface(Interface &gui);
-bool initializeGuiFiles(Interface &gui);
+bool loadGuiFiles(Interface &gui);
 void initializePoints(Interface &gui);
 void initializeScore(Interface &gui);
 void initializeStatistic(Interface &gui);
@@ -43,5 +43,5 @@ void initializeGuide(Interface &gui);
 void initializeGameName(Interface &gui);
 void initializeGameOver(Interface &gui);
 void initializeSound(Interface &gui);
-bool addPoint(Interface &gui);
+void addPoint(Interface &gui);
 void stayingInterfaceAnimate(float elapsedTime, Interface &gui);

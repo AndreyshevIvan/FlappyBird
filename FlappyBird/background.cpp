@@ -12,7 +12,7 @@ static const sf::Vector2f TUBE_SIZE = { 52, 400 };
 static const sf::Vector2f WRAPPER_SIZE = { RESOLUTION_W, 125 };
 
 static const float GROUND_OFFSET = 446;
-static const float TUBES_OFFSET = RESOLUTION_W / 2.0f;
+static const float TUBES_OFFSET = RESOLUTION_W / 2;
 static const float INIT_OFFSET = RESOLUTION_W + 200;
 static const float VERTICAL_OFFSET = 60;
 
@@ -21,8 +21,8 @@ static const sf::Vector2f GROUND_POS = { 0, RESOLUTION_H - GROUND_SIZE.y };
 
 static const float TUBE_GAP = 150;
 
-static const int MIN_TUBE_HEIGHT = TUBE_GAP + VERTICAL_OFFSET;
-static const int MAX_TUBE_HEIGHT = RESOLUTION_H - GROUND_SIZE.y - VERTICAL_OFFSET;
+static const int MIN_TUBE_HEIGHT = (int)(TUBE_GAP + VERTICAL_OFFSET);
+static const int MAX_TUBE_HEIGHT = (int)(RESOLUTION_H - GROUND_SIZE.y - VERTICAL_OFFSET);
 
 bool inititalizeWrapper(Background &background)
 {
@@ -65,7 +65,7 @@ bool inititalizeTubes(Background &background)
 		bottomTube = sf::RectangleShape(TUBE_SIZE);
 		bottomTube.setTexture(&background.tubeTextureBottom);
 		bottomTube.setOrigin(TUBE_SIZE.x / 2.0f, 0);
-		bottomTube.setPosition(INIT_OFFSET + tubesNumber * TUBES_OFFSET, randomHeight);
+		bottomTube.setPosition((float)(INIT_OFFSET + tubesNumber * TUBES_OFFSET), (float)randomHeight);
 
 		topTube = bottomTube;
 		topTube.rotate(180);
@@ -124,7 +124,7 @@ void moveTubes(const float &moveSpeed, Background &background)
 		{
 			int randomHeight = rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT) + MIN_TUBE_HEIGHT;
 
-			bottomTube.setPosition(bottomTube.getPosition().x + (TUBES_OFFSET * TUBES_COUNT), randomHeight);
+			bottomTube.setPosition(bottomTube.getPosition().x + (TUBES_OFFSET * (float)TUBES_COUNT), (float)randomHeight);
 			topTube.setPosition(bottomTube.getPosition().x, bottomTube.getPosition().y - TUBE_GAP);
 
 			background.tubes[tubeNumber][0].setPosition(bottomTube.getPosition());

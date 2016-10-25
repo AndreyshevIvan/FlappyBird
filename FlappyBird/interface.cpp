@@ -20,20 +20,20 @@ static const sf::Vector2f POINTS_POS = { RESOLUTION_W / 2.0f, 20 };
 static const sf::Vector2f SCORE_POS = { (RESOLUTION_W + STATISTIC_SIZE.x) / 2.0f - 25, RESOLUTION_H / 2.0f - STATISTIC_SIZE.y / 4.3f};
 static const sf::Vector2f FONT_PRESS_R_POS = { RESOLUTION_W / 2.0f, STATISTIC_POS.y + 90 };
 
-static const int FONT_POINTS_SIZE = 40;
-static const int FONT_SCORE_SIZE = 30;
-static const int FONT_PRESS_R_SIZE = 18;
-static const int FONT_OUTLINE_THICKNESS = 4;
-static const int FONT_OUTLINE_THICKNESS_PRESS_R = 2;
+static const unsigned int FONT_POINTS_SIZE = 40;
+static const unsigned int FONT_SCORE_SIZE = 30;
+static const unsigned int FONT_PRESS_R_SIZE = 18;
+static const unsigned int FONT_OUTLINE_THICKNESS_4 = 4;
+static const unsigned int FONT_OUTLINE_THICKNESS_2 = 2;
 static const sf::Color FONT_COLOR = sf::Color(250, 250, 250);
 static const sf::Color FONT_OUTLINE_COLOR = sf::Color(92, 53, 70);
 
 static const float FLAPPING_SPEED = 15;
-static const float OSCILLATION_AMPLITUDE = 0.12;
+static const float OSCILLATION_AMPLITUDE = 0.12f;
 
 static const int POINTS_TO_WIN = 1000;
 
-bool initializeGuiFiles(Interface &gui)
+bool loadGuiFiles(Interface &gui)
 {
 	if (!gui.pointsFont.loadFromFile("resources/FlappyBird.otf"))
 		return false;
@@ -60,7 +60,7 @@ void initializePoints(Interface &gui)
 	sf::Text startPoints("0", gui.pointsFont, FONT_POINTS_SIZE);
 	gui.points = startPoints;
 	gui.points.setOutlineColor(FONT_OUTLINE_COLOR);
-	gui.points.setOutlineThickness(FONT_OUTLINE_THICKNESS);
+	gui.points.setOutlineThickness((float)FONT_OUTLINE_THICKNESS_4);
 	gui.points.setFillColor(FONT_COLOR);
 	gui.points.setOrigin(gui.points.getGlobalBounds().width / 2.0f, 0);
 	gui.points.setPosition(POINTS_POS);
@@ -73,7 +73,7 @@ void initializeScore(Interface &gui)
 
 	gui.score = startPoints;
 	gui.score.setOutlineColor(FONT_OUTLINE_COLOR);
-	gui.score.setOutlineThickness(FONT_OUTLINE_THICKNESS);
+	gui.score.setOutlineThickness((float)FONT_OUTLINE_THICKNESS_2);
 	gui.score.setFillColor(FONT_COLOR);
 	gui.score.setString(toString(gui.pointsCount));
 	gui.score.setOrigin(gui.score.getGlobalBounds().width, 0);
@@ -86,7 +86,7 @@ void initializePressR(Interface &gui)
 
 	gui.pressR = startPoints;
 	gui.pressR.setOutlineColor(FONT_OUTLINE_COLOR);
-	gui.pressR.setOutlineThickness(FONT_OUTLINE_THICKNESS_PRESS_R);
+	gui.pressR.setOutlineThickness((float)FONT_OUTLINE_THICKNESS_2);
 	gui.pressR.setFillColor(FONT_COLOR);
 	gui.pressR.setOrigin(gui.pressR.getGlobalBounds().width / 2.0f, 0);
 	gui.pressR.setPosition(FONT_PRESS_R_POS);
@@ -127,7 +127,7 @@ void initializeGameOver(Interface &gui)
 
 bool initializeInterface(Interface &gui)
 {
-	if (!initializeGuiFiles(gui))
+	if (!loadGuiFiles(gui))
 		return false;
 
 	initializePoints(gui);
@@ -141,18 +141,16 @@ bool initializeInterface(Interface &gui)
 	return true;
 }
 
-bool addPoint(Interface &gui)
+void addPoint(Interface &gui)
 {
 	gui.pointsCount += 1;
 	gui.pointSound.play();
-	if (gui.pointsCount > POINTS_TO_WIN)
-		return false;
+	if (gui.pointsCount >= POINTS_TO_WIN)
+		exit(1);
 
 	gui.points.setString(toString(gui.pointsCount));
 	gui.points.setOrigin(gui.points.getGlobalBounds().width / 2.0f, 0);
 	gui.points.setPosition(POINTS_POS);
-
-	return true;
 }
 
 void initializeSound(Interface &gui)
