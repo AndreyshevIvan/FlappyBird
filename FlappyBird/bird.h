@@ -1,17 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "interface.h"
-
-enum GameStatus
-{
-	PLAYING,
-	NOT_STARTED,
-	GAME_PAUSED
-};
+#include "background.h"
 
 struct Bird
 {
-	GameStatus status;
 	std::vector<float> jumpingVector; // {time, past height}
 	sf::RectangleShape shape;
 	sf::CircleShape collisionShape;
@@ -19,9 +12,11 @@ struct Bird
 	float animTime[2];
 };
 
-bool initializeBird(Bird &bird);
-bool initializeBody(Bird &bird);
-void initializeCollisionShape(Bird &bird);
+bool initBird(Bird &bird);
+bool initBody(Bird &bird);
+void initCollisionShape(Bird &bird);
+void isTubeChecked(Bird &bird, Background &background, Interface &gui);
+bool collision(Bird &bird, Background background);
 void startJump(Bird &bird, Interface &gui);
 void birdJump(const float &elapsedTime, Bird &bird);
 void flappingAnimate(Bird &bird, const float &elapsedTime);

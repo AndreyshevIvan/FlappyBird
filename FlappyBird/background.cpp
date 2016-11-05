@@ -24,6 +24,8 @@ static const float TUBE_GAP = 150;
 static const int MIN_TUBE_HEIGHT = (int)(TUBE_GAP + VERTICAL_OFFSET);
 static const int MAX_TUBE_HEIGHT = (int)(RESOLUTION_H - GROUND_SIZE.y - VERTICAL_OFFSET);
 
+const float SPEED = 250.f; // pixels per second.
+
 bool inititalizeWrapper(Background &background)
 {
 	if (!background.wrapperTexture.loadFromFile("resources/wrapper.png"))
@@ -37,6 +39,8 @@ bool inititalizeWrapper(Background &background)
 
 bool inititalizeGround(Background &background)
 {
+	srand((unsigned)time(NULL));
+
 	if (!background.groundTexture.loadFromFile("resources/ground.png"))
 		return false;
 	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
@@ -79,7 +83,7 @@ bool inititalizeTubes(Background &background)
 	return true;
 }
 
-bool initializeBackground(Background &background)
+bool initBackground(Background &background)
 {
 	if (!inititalizeWrapper(background) || !inititalizeGround(background) || !inititalizeTubes(background))
 		return false;
@@ -95,8 +99,10 @@ void drawGround(sf::RenderWindow &window, sf::RectangleShape ground[])
 		window.draw(ground[groundNumber]);
 }
 
-void moveGround(const float &moveSpeed, sf::RectangleShape ground[])
+void moveGround(float &elapsedTime, sf::RectangleShape ground[])
 {
+	const float moveSpeed = SPEED * elapsedTime;
+
 	for (int groundNumber = 0; groundNumber < GROUNDS_COUNT; groundNumber++)
 	{
 		if (ground[groundNumber].getPosition().x + GROUND_SIZE.x <= 0)
@@ -114,8 +120,10 @@ void drawTubes(sf::RenderWindow &window, Background &background)
 	}
 }
 
-void moveTubes(const float &moveSpeed, Background &background)
+void moveTubes(float &elapsedTime, Background &background)
 {
+	const float moveSpeed = SPEED * elapsedTime;
+
 	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
 	{
 		sf::RectangleShape bottomTube = background.tubes[tubeNumber][0];

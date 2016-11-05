@@ -55,7 +55,7 @@ bool loadGuiFiles(Interface &gui)
 	return true;
 }
 
-void initializePoints(Interface &gui) 
+void initPoints(Interface &gui) 
 {
 	sf::Text startPoints("0", gui.pointsFont, FONT_POINTS_SIZE);
 	gui.points = startPoints;
@@ -67,7 +67,7 @@ void initializePoints(Interface &gui)
 	gui.pointsCount = 0;
 }
 
-void initializeScore(Interface &gui)
+void initScore(Interface &gui)
 {
 	sf::Text startPoints("0", gui.pointsFont, FONT_SCORE_SIZE);
 
@@ -80,7 +80,7 @@ void initializeScore(Interface &gui)
 	gui.score.setPosition(SCORE_POS);
 }
 
-void initializePressR(Interface &gui)
+void initPressR(Interface &gui)
 {
 	sf::Text startPoints("PRESS 'R' TO RESTART", gui.pointsFont, FONT_PRESS_R_SIZE);
 
@@ -92,7 +92,7 @@ void initializePressR(Interface &gui)
 	gui.pressR.setPosition(FONT_PRESS_R_POS);
 }
 
-void initializeStatistic(Interface &gui)
+void initStatistic(Interface &gui)
 {
 	gui.statistic.setSize(STATISTIC_SIZE);
 	gui.statistic.setTexture(&gui.statisticTexture);
@@ -100,7 +100,7 @@ void initializeStatistic(Interface &gui)
 	gui.statistic.setPosition(RESOLUTION_W / 2.0f, RESOLUTION_H / 2.0f);
 }
 
-void initializeGuide(Interface &gui)
+void initGuide(Interface &gui)
 {
 	gui.guide.setSize(GUIDE_SIZE);
 	gui.guide.setTexture(&gui.guideTexture);
@@ -109,7 +109,7 @@ void initializeGuide(Interface &gui)
 	gui.guideTimer = 0;
 }
 
-void initializeGameName(Interface &gui)
+void initGameName(Interface &gui)
 {
 	gui.gameName.setSize(GAME_NAME_SIZE);
 	gui.gameName.setOrigin(GAME_NAME_SIZE.x / 2.0f, GAME_NAME_SIZE.y / 2.0f);
@@ -117,7 +117,7 @@ void initializeGameName(Interface &gui)
 	gui.gameName.setTexture(&gui.gameNameTexture);
 }
 
-void initializeGameOver(Interface &gui)
+void initGameOver(Interface &gui)
 {
 	gui.gameOver.setSize(GAME_OVER_SIZE);
 	gui.gameOver.setOrigin(GAME_OVER_SIZE.x / 2.0f, GAME_OVER_SIZE.y / 2.0f);
@@ -125,18 +125,18 @@ void initializeGameOver(Interface &gui)
 	gui.gameOver.setTexture(&gui.gameOverTexture);
 }
 
-bool initializeInterface(Interface &gui)
+bool initInterface(Interface &gui)
 {
 	if (!loadGuiFiles(gui))
 		return false;
 
-	initializePoints(gui);
-	initializeStatistic(gui);
-	initializePressR(gui);
-	initializeGuide(gui);
-	initializeGameName(gui);
-	initializeGameOver(gui);
-	initializeSound(gui);
+	initPoints(gui);
+	initStatistic(gui);
+	initPressR(gui);
+	initGuide(gui);
+	initGameName(gui);
+	initGameOver(gui);
+	initSound(gui);
 
 	return true;
 }
@@ -153,7 +153,7 @@ void addPoint(Interface &gui)
 	gui.points.setPosition(POINTS_POS);
 }
 
-void initializeSound(Interface &gui)
+void initSound(Interface &gui)
 {
 	gui.pointSound.setVolume(30);
 	gui.wingSound.setVolume(40);

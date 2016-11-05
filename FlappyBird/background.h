@@ -17,11 +17,11 @@ struct Background
 	bool tubeStatus[TUBES_COUNT];
 };
 
-bool initializeBackground(Background &background);
+bool initBackground(Background &background);
 bool inititalizeWrapper(Background &background);
 bool inititalizeGround(Background &background);
-void moveGround(const float &moveSpeed, sf::RectangleShape ground[]);
+void moveGround(float &elapsedTime, sf::RectangleShape ground[]);
 void drawGround(sf::RenderWindow &window, sf::RectangleShape ground[]);
 bool inititalizeTubes(Background &background);
-void moveTubes(const float &moveSpeed, Background &background);
+void moveTubes(float &elapsedTIme, Background &background);
 void drawTubes(sf::RenderWindow &window, Background &background);

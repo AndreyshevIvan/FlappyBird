@@ -22,7 +22,7 @@ static const float DOWN_ROT_SPEED = 280;
 static const float FLAPPING_SPEED = 15;
 static const float OSCILLATION_AMPLITUDE = 0.12f;
 
-bool initializeBody(Bird &bird)
+bool initBody(Bird &bird)
 {
 	bird.shape.setSize(BIRD_SIZE);
 	if (!bird.shapeTexture.loadFromFile("resources/mainHero.png"))
@@ -36,24 +36,48 @@ bool initializeBody(Bird &bird)
 	return true;
 }
 
-void initializeCollisionShape(Bird &bird)
+void initCollisionShape(Bird &bird)
 {
 	bird.collisionShape.setRadius(COLLISION_SHAPE_RADIUS);
 	bird.collisionShape.setOrigin(COLLISION_SHAPE_RADIUS, COLLISION_SHAPE_RADIUS);
 	bird.collisionShape.setPosition(BIRD_POSITION);
 }
 
-bool initializeBird(Bird &bird)
+bool initBird(Bird &bird)
 {
-	if (!initializeBody(bird))
+	if (!initBody(bird))
 		return false;
-	initializeCollisionShape(bird);
-	bird.status = NOT_STARTED;
+	initCollisionShape(bird);
 	bird.jumpingVector = { 0, 0 }; // {time, past height}
 	bird.animTime[0] = 0;
 	bird.animTime[1] = 0;
 
 	return true;
+}
+
+bool collision(Bird &bird, Background background)
+{
+	auto collisionShape = bird.collisionShape.getGlobalBounds();
+	for (int number = 0; number < GROUNDS_COUNT; number++)
+		if
+			(
+				collisionShape.intersects(background.tubes[number][0].getGlobalBounds()) ||
+				collisionShape.intersects(background.tubes[number][1].getGlobalBounds()) ||
+				collisionShape.intersects(background.ground[number].getGlobalBounds())
+				)
+			return true;
+
+	return false;
+}
+
+void isTubeChecked(Bird &bird, Background &background, Interface &gui)
+{
+	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
+		if (background.tubes[tubeNumber][0].getPosition().x <= bird.shape.getPosition().x && !background.tubeStatus[tubeNumber])
+		{
+			background.tubeStatus[tubeNumber] = true;
+			addPoint(gui);
+		}
 }
 
 void flappingAnimate(Bird &bird, const float &elapsedTime)

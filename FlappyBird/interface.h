@@ -33,15 +33,15 @@ std::string toString(T val)
 	return oss.str();
 }
 
-bool initializeInterface(Interface &gui);
+bool initInterface(Interface &gui);
 bool loadGuiFiles(Interface &gui);
-void initializePoints(Interface &gui);
-void initializeScore(Interface &gui);
-void initializeStatistic(Interface &gui);
-void initializePressR(Interface &gui);
-void initializeGuide(Interface &gui);
-void initializeGameName(Interface &gui);
-void initializeGameOver(Interface &gui);
-void initializeSound(Interface &gui);
+void initPoints(Interface &gui);
+void initScore(Interface &gui);
+void initStatistic(Interface &gui);
+void initPressR(Interface &gui);
+void initGuide(Interface &gui);
+void initGameName(Interface &gui);
+void initGameOver(Interface &gui);
+void initSound(Interface &gui);
 void addPoint(Interface &gui);
 void stayingInterfaceAnimate(float elapsedTime, Interface &gui);

@@ -3,25 +3,100 @@
 #include "bird.h"
 #include "background.h"
 #include "interface.h"
+#include <cassert>
+#include <functional>
+#include <iostream>
 
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
 
-const float SPEED = 250.f; // pixels per second.
-
-bool initializeGame(Bird &bird, Background &background, Interface &gui)
+struct GameBehavior
 {
-	if (!initializeBird(bird))
-		exit(1);
-	if (!initializeBackground(background))
-		exit(1);
-	if (!initializeInterface(gui))
-		exit(1);
+	std::function<void(float dt)> onUpdate;
+	std::function<void(sf::RenderWindow &window)> onDraw;
+};
 
-	return true;
+struct GameSystem
+{
+	Bird bird;
+	Background background;
+	Interface gui;
+	sf::Clock clock;
+	GameBehavior m_startBehavior;
+	GameBehavior m_gameplayBehavior;
+	GameBehavior m_pauseBehavior;
+	GameBehavior *m_currentBehavior = nullptr;
+};
+
+void initGameStructs(Bird &bird, Background &background, Interface &gui)
+{
+	bool inited = initBird(bird)
+		&& initBackground(background)
+		&& initInterface(gui);
+
+	if (!inited)
+	{
+		assert(false);
+		exit(1);
+	}
 }
 
-void handleEvents(sf::RenderWindow &window, Bird &bird, Background &background, Interface &gui)
+void initStartBehavior(GameSystem &system)
+{
+	system.m_startBehavior.onUpdate = [&](float elapsedTime) {
+		flappingAnimate(system.bird, elapsedTime);
+		stayingAnimate(system.bird, elapsedTime);
+		stayingInterfaceAnimate(elapsedTime, system.gui);
+	};
+	system.m_startBehavior.onDraw = [&](sf::RenderWindow &window) {
+		window.draw(system.gui.gameName);
+		window.draw(system.gui.guide);
+	};
+}
+
+void initGameplayBehavior(GameSystem &system)
+{
+	system.m_gameplayBehavior.onUpdate = [&](float elapsedTime) {
+		flappingAnimate(system.bird, elapsedTime);
+		moveGround(elapsedTime, system.background.ground);
+		birdJump(elapsedTime, system.bird);
+		moveTubes(elapsedTime, system.background);
+		isTubeChecked(system.bird, system.background, system.gui);
+		if (collision(system.bird, system.background))
+		{
+			system.gui.failSound.play();
+			initScore(system.gui);
+			system.m_currentBehavior = &system.m_pauseBehavior;
+		}
+	};
+	system.m_gameplayBehavior.onDraw = [&](sf::RenderWindow &window) {
+		window.draw(system.gui.points);
+	};
+}
+
+void initPauseBehavior(GameSystem &system)
+{
+	system.m_pauseBehavior.onUpdate = [&](float elapsedTime) {
+	};
+	system.m_pauseBehavior.onDraw = [&](sf::RenderWindow &window) {
+		window.draw(system.gui.statistic);
+		window.draw(system.gui.score);
+		window.draw(system.gui.gameOver);
+		window.draw(system.gui.pressR);
+	};
+}
+
+void initGameSystem(GameSystem &system)
+{
+	initGameStructs(system.bird, system.background, system.gui);
+	initStartBehavior(system);
+	initGameplayBehavior(system);
+	initPauseBehavior(system);
+
+	system.m_currentBehavior = &system.m_startBehavior;
+}
+
+void handleEvents(GameSystem &system, sf::RenderWindow &window)
 {
 	sf::Event event;
 	while (window.pollEvent(event))
@@ -29,102 +104,44 @@ void handleEvents(sf::RenderWindow &window, Bird &bird, Background &background, 
 		if (event.type == sf::Event::Closed)
 			window.close();
 
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space && bird.status != GAME_PAUSED)
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space && system.m_currentBehavior != &system.m_pauseBehavior)
 		{
-			startJump(bird, gui);
-			bird.status = PLAYING;
+			startJump(system.bird, system.gui);
+			system.m_currentBehavior = &system.m_gameplayBehavior;
 		}
 
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R && bird.status == GAME_PAUSED)
-			initializeGame(bird, background, gui);
-	}
-}
-
-bool collision(Bird &bird, Background background)
-{
-	auto collisionShape = bird.collisionShape.getGlobalBounds();
-	for (int number = 0; number < GROUNDS_COUNT; number++)
-	{
-		if
-			(
-				collisionShape.intersects(background.tubes[number][0].getGlobalBounds()) ||
-				collisionShape.intersects(background.tubes[number][1].getGlobalBounds()) ||
-				collisionShape.intersects(background.ground[number].getGlobalBounds())
-				)
-			return true;
-	}
-
-	return false;
-}
-
-void isTubeChecked(Bird &bird, Background &background, Interface &gui)
-{
-	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
-	{
-		if (background.tubes[tubeNumber][0].getPosition().x <= bird.shape.getPosition().x && !background.tubeStatus[tubeNumber])
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R && system.m_currentBehavior == &system.m_pauseBehavior)
 		{
-			background.tubeStatus[tubeNumber] = true;
-			addPoint(gui);
+			system.m_currentBehavior = &system.m_startBehavior;
+			initGameSystem(system);
 		}
 	}
 }
 
-void update(sf::Clock &clock, Background &background, Bird &bird, Interface &gui)
-{
-	const float elapsedTime = clock.getElapsedTime().asSeconds();
-	const float moveSpeed = SPEED * elapsedTime;
-
-	clock.restart();
-
-	switch (bird.status)
-	{
-	case NOT_STARTED:
-		flappingAnimate(bird, elapsedTime);
-		stayingAnimate(bird, elapsedTime);
-		stayingInterfaceAnimate(elapsedTime, gui);
-		break;
-	case PLAYING:
-		flappingAnimate(bird, elapsedTime);
-		moveGround(moveSpeed, background.ground);
-		birdJump(elapsedTime, bird);
-		moveTubes(moveSpeed, background);
-		isTubeChecked(bird, background, gui);
-		if (collision(bird, background))
-		{
-			gui.failSound.play();
-			initializeScore(gui);
-			bird.status = GAME_PAUSED;
-		}
-		break;
-	case GAME_PAUSED:
-		break;
-	}
-}
-
-void render(sf::RenderWindow &window, const Bird &bird, Background &background, Interface &gui)
+void render(GameSystem &system, sf::RenderWindow &window)
 {
 	window.clear(SKY_COLOR);
-	window.draw(background.wrapper);
-	drawTubes(window, background);
-	drawGround(window, background.ground);
-	window.draw(bird.shape);
-	switch (bird.status)
-	{
-	case NOT_STARTED:
-		window.draw(gui.gameName);
-		window.draw(gui.guide);
-		break;
-	case PLAYING:
-		window.draw(gui.points);
-		break;
-	case GAME_PAUSED:
-		window.draw(gui.statistic);
-		window.draw(gui.score);
-		window.draw(gui.gameOver);
-		window.draw(gui.pressR);
-		break;
-	}
+	window.draw(system.background.wrapper);
+	drawTubes(window, system.background);
+	drawGround(window, system.background.ground);
+	window.draw(system.bird.shape);
+
+	system.m_currentBehavior->onDraw(window);
+
 	window.display();
+}
+
+void enterGameLoop(GameSystem &flappyBird, sf::RenderWindow &window)
+{
+	while (window.isOpen())
+	{
+		const float elapsedTime = flappyBird.clock.getElapsedTime().asSeconds();
+		flappyBird.clock.restart();
+
+		handleEvents(flappyBird, window);
+		flappyBird.m_currentBehavior->onUpdate(elapsedTime);
+		render(flappyBird, window);
+	}
 }
 
 int main()
@@ -132,20 +149,10 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), "Flappy Bird", sf::Style::Titlebar + sf::Style::Close);
 	window.setKeyRepeatEnabled(false);
 
-	Bird bird;
-	Background background;
-	Interface gui;
-	sf::Clock clock;
+	GameSystem flappyBird;
+	initGameSystem(flappyBird);
 
-	srand((unsigned)time(NULL));
-	initializeGame(bird, background, gui);
-
-	while (window.isOpen())
-	{
-		handleEvents(window, bird, background, gui);
-		update(clock, background, bird, gui);
-		render(window, bird, background, gui);
-	}
+	enterGameLoop(flappyBird, window);
 
 	return 0;
 }
