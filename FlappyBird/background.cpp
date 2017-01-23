@@ -145,6 +145,8 @@ void Background::UpdateTubes(float elapsedTime)
 
 void Background::Draw(sf::RenderWindow& window)
 {
+	window.draw(wrapper);
+
 	for (auto tube : tubes)
 		window.draw(tube);
 

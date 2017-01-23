@@ -37,6 +37,8 @@ Bird::Bird()
 
 void Bird::Init()
 {
+	status = BirdStatus::IDLE;
+
 	m_body.setPosition(BIRD_POSITION);
 	m_body.setRotation(0);
 	m_collisionShape.setPosition(BIRD_POSITION);
@@ -46,52 +48,71 @@ void Bird::Init()
 	m_idleAnimTime = 0;
 }
 
-void flappingAnimate(Bird &bird, const float &elapsedTime)
+void Bird::FlappingAnimate(float elapsedTime)
 {
-	bird.m_flappingAnimTime += FLAPPING_SPEED * elapsedTime;
-	if ((int)bird.m_flappingAnimTime > 2)
-		bird.m_flappingAnimTime = 0;
-	bird.m_body.setTextureRect(sf::IntRect((int)bird.m_flappingAnimTime * 34, 0, 34, 24));
+	m_flappingAnimTime += FLAPPING_SPEED * elapsedTime;
+	if (static_cast<int>(m_flappingAnimTime) > 2)
+		m_flappingAnimTime = 0;
+	m_body.setTextureRect(sf::IntRect((int)m_flappingAnimTime * 34, 0, 34, 24));
 }
 
-void stayingAnimate(Bird &bird, const float &elapsedTime)
+void Bird::Idle(float elapsedTime)
 {
 	const float PI = float(M_PI);
 
-	bird.m_idleAnimTime += 1 * elapsedTime;
-	if (bird.m_idleAnimTime >= 2 * PI)
-		bird.m_idleAnimTime = 0;
-	bird.m_body.move(0, OSCILLATION_AMPLITUDE * sin(FLAPPING_SPEED * bird.m_idleAnimTime));
+	m_idleAnimTime += 1 * elapsedTime;
+	if (m_idleAnimTime >= 2 * PI)
+		m_idleAnimTime = 0;
+	m_body.move(0, OSCILLATION_AMPLITUDE * sin(FLAPPING_SPEED * m_idleAnimTime));
 }
 
-void startJump(Bird &bird, Interface &gui)
+void Bird::Draw(sf::RenderWindow& window)
 {
-	gui.wingSound.play();
-	bird.jumpingVector = { 0, 0 };
+	window.draw(m_body);
 }
 
-void birdJump(const float &elapsedTime, Bird &bird)
+void Bird::Jump()
 {
-	float time = bird.jumpingVector[0] += elapsedTime;
-	float pastHeight = bird.jumpingVector[1];
+	status = BirdStatus::FLAPPING;
+	jumpingVector = { 0, 0 };
+}
+
+void Bird::Update(float elapsedTime)
+{
+	if (status == BirdStatus::IDLE)
+	{
+		Idle(elapsedTime);
+	}
+	else if (status == BirdStatus::FLAPPING)
+	{
+		UpdateGravity(elapsedTime);
+	}
+
+	FlappingAnimate(elapsedTime);
+}
+
+void Bird::UpdateGravity(float elapsedTime)
+{
+	float time = jumpingVector[0] += elapsedTime;
+	float pastHeight = jumpingVector[1];
 	float height;
 	float movement;
 
-	bird.jumpingVector[1] = height = JUMP_SPEED * time - 0.5f * G * pow(time, 2.0f);
+	jumpingVector[1] = height = JUMP_SPEED * time - 0.5f * G * pow(time, 2.0f);
 	movement = pastHeight - height;
 
-	if (bird.m_body.getPosition().y < ROOF)
-		bird.m_body.setPosition(BIRD_POSITION.x, ROOF);
+	if (m_body.getPosition().y < ROOF)
+		m_body.setPosition(BIRD_POSITION.x, ROOF);
 
 	if (movement < 0)
-		bird.m_body.setRotation(UP_ROT_ANGALE);
-	else if (bird.m_body.getRotation() != DOWN_ROT_ANGLE)
+		m_body.setRotation(UP_ROT_ANGALE);
+	else if (m_body.getRotation() != DOWN_ROT_ANGLE)
 	{
-		bird.m_body.rotate(DOWN_ROT_SPEED * elapsedTime);
-		if (bird.m_body.getRotation() < 360 + UP_ROT_ANGALE && bird.m_body.getRotation() > DOWN_ROT_ANGLE)
-			bird.m_body.setRotation(DOWN_ROT_ANGLE);
+		m_body.rotate(DOWN_ROT_SPEED * elapsedTime);
+		if (m_body.getRotation() < 360 + UP_ROT_ANGALE && m_body.getRotation() > DOWN_ROT_ANGLE)
+			m_body.setRotation(DOWN_ROT_ANGLE);
 	}
 
-	bird.m_body.move(0, IMPULSE * movement);
-	bird.m_collisionShape.setPosition(bird.m_body.getPosition());
+	m_body.move(0, IMPULSE * movement);
+	m_collisionShape.setPosition(m_body.getPosition());
 }

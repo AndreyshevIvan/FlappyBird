@@ -3,9 +3,17 @@
 #include "interface.h"
 #include "background.h"
 
+enum struct BirdStatus
+{
+	IDLE,
+	FLAPPING,
+};
+
 struct Bird
 {
 	Bird();
+
+	BirdStatus status;
 
 	std::vector<float> jumpingVector; // {time, past height}
 
@@ -17,9 +25,14 @@ struct Bird
 	float m_idleAnimTime;
 
 	void Init();
-};
 
-void startJump(Bird &bird, Interface &gui);
-void birdJump(const float &elapsedTime, Bird &bird);
-void flappingAnimate(Bird &bird, const float &elapsedTime);
-void stayingAnimate(Bird &bird, const float &elapsedTime);
+	void Jump();
+
+	void FlappingAnimate(float elapsedTime);
+	void Idle(float elapsedTime);
+
+	void Update(float elapsedTime);
+	void UpdateGravity(float elapsedTime);
+
+	void Draw(sf::RenderWindow& window);
+};

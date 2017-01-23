@@ -6,7 +6,7 @@ static const int RESOLUTION_H = 640;
 static const std::string GAME_NAME = "Flappy Bird";
 
 void InitScenes(Game& game);
-void InitStartScene(Game &system);
+void InitStartScene(Game& system);
 void InitGameplayScene(Game& game);
 void IninFinishScene(Game& game);
 
@@ -63,12 +63,7 @@ void Update(Game& game)
 void Render(Game& game, sf::RenderWindow& window)
 {
 	window.clear(SKY_COLOR);
-
-	window.draw(game.background.wrapper);
-	game.background.Draw(window);
 	game.m_currentScene->onDraw(window);
-	window.draw(game.bird.m_body);
-
 	window.display();
 }
 
@@ -84,12 +79,13 @@ void InitScenes(Game& game)
 void InitStartScene(Game& game)
 {
 	game.m_startScene.onUpdate = [&]() {
-		flappingAnimate(game.bird, game.m_elapsedTime);
-		stayingAnimate(game.bird, game.m_elapsedTime);
+		game.bird.Update(game.m_elapsedTime);
 		stayingInterfaceAnimate(game.m_elapsedTime, game.gui);
 	};
 
 	game.m_startScene.onDraw = [&](sf::RenderWindow &window) {
+		game.background.Draw(window);
+		game.bird.Draw(window);
 		window.draw(game.gui.gameName);
 		window.draw(game.gui.guide);
 	};
@@ -97,7 +93,8 @@ void InitStartScene(Game& game)
 	game.m_startScene.toHandle = [&](sf::Event &event) {
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 		{
-			startJump(game.bird, game.gui);
+			game.bird.Jump();
+			game.gui.wingSound.play();
 			game.m_currentScene = &game.m_gameplayScene;
 		}
 	};
@@ -106,21 +103,23 @@ void InitStartScene(Game& game)
 void InitGameplayScene(Game& game)
 {
 	game.m_gameplayScene.onUpdate = [&]() {
-		flappingAnimate(game.bird, game.m_elapsedTime);
 		game.background.Update(game.m_elapsedTime);
-		birdJump(game.m_elapsedTime, game.bird);
+		game.bird.Update(game.m_elapsedTime);
 		game.CheckTubeComplete();
 		game.CheckBirdCollide();
 	};
 
 	game.m_gameplayScene.onDraw = [&](sf::RenderWindow &window) {
+		game.background.Draw(window);
+		game.bird.Draw(window);
 		window.draw(game.gui.points);
 	};
 
 	game.m_gameplayScene.toHandle = [&](sf::Event & event) {
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 		{
-			startJump(game.bird, game.gui);
+			game.bird.Jump();
+			game.gui.wingSound.play();
 			game.m_currentScene = &game.m_gameplayScene;
 		}
 	};
@@ -132,6 +131,8 @@ void IninFinishScene(Game& game)
 	};
 
 	game.m_finishScene.onDraw = [&](sf::RenderWindow &window) {
+		game.background.Draw(window);
+		game.bird.Draw(window);
 		window.draw(game.gui.statistic);
 		window.draw(game.gui.score);
 		window.draw(game.gui.gameOver);
