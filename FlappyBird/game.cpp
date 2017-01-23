@@ -46,9 +46,9 @@ void Game::CheckTubeComplete()
 		const float birdPos = bird.m_body.getPosition().x;
 		const float tubePos = background.tubes[tube].getPosition().x;
 
-		if (tubePos <= birdPos && !background.tubesStatuses[tube])
+		if (tubePos <= birdPos && !background.tubesStatuses[tube / 2])
 		{
-			background.tubesStatuses[tube] = true;
+			background.tubesStatuses[tube / 2] = true;
 			addPoint(gui);
 		}
 	}

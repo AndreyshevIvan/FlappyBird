@@ -27,58 +27,46 @@ static const int MAX_TUBE_HEIGHT = (int)(RESOLUTION_H - GROUND_SIZE.y - VERTICAL
 const float SPEED = 250.f; // pixels per second.
 
 
-Background::Background()
-{
-	Init();
-}
-
 void Background::Init()
 {
 	srand((unsigned)time(NULL));
 
-	initWrapper(*this);
-	initGround(*this);
-	initTubes(*this);
-	for (size_t status = 0; status < TUBES_COUNT / 2; status++)
-	{
-		tubesStatuses.push_back(false);
-	}
+	InitWrapper();
+	InitGround();
+	InitTubes();
 }
 
-bool initWrapper(Background &background)
+void Background::InitWrapper()
 {
-	if (!background.wrapperTexture.loadFromFile("resources/wrapper.png"))
-		return false;
-	background.wrapper = sf::RectangleShape(WRAPPER_SIZE);
-	background.wrapper.setTexture(&background.wrapperTexture);
-	background.wrapper.setPosition(WRAPPER_POS);
+	wrapperTexture.loadFromFile("resources/wrapper.png");
 
-	return true;
+	wrapper = sf::RectangleShape(WRAPPER_SIZE);
+	wrapper.setTexture(&wrapperTexture);
+	wrapper.setPosition(WRAPPER_POS);
 }
 
-bool initGround(Background &background)
+void Background::InitGround()
 {
-	background.groundTexture.loadFromFile("resources/ground.png");
+	groundTexture.loadFromFile("resources/ground.png");
 
 	for (size_t ground = 0; ground < GROUNDS_COUNT; ground++)
 	{
 		sf::RectangleShape groundBlock;
 		groundBlock.setSize(GROUND_SIZE);
-		groundBlock.setTexture(&background.groundTexture);
+		groundBlock.setTexture(&groundTexture);
 		groundBlock.setPosition(GROUND_OFFSET * ground, GROUND_POS.y);
 
-		background.grounds.push_back(groundBlock);
+		grounds.push_back(groundBlock);
 	}
-
-	return true;
 }
 
-bool initTubes(Background& background)
+void Background::InitTubes()
 {
-	background.tubes.clear();
+	tubes.clear();
+	tubesStatuses.clear();
 
-	background.tubeTextureBottom.loadFromFile("resources/tubeBottom.png");
-	background.tubeTextureTop.loadFromFile("resources/tubeTop.png");
+	tubeTextureBottom.loadFromFile("resources/tubeBottom.png");
+	tubeTextureTop.loadFromFile("resources/tubeTop.png");
 
 	for (int tubesNumber = 0; tubesNumber < TUBES_COUNT; tubesNumber++)
 	{
@@ -88,29 +76,32 @@ bool initTubes(Background& background)
 		int randomHeight = MIN_TUBE_HEIGHT + rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT);
 
 		bottomTube = sf::RectangleShape(TUBE_SIZE);
-		bottomTube.setTexture(&background.tubeTextureBottom);
+		bottomTube.setTexture(&tubeTextureBottom);
 		bottomTube.setOrigin(TUBE_SIZE.x / 2.0f, 0);
 		bottomTube.setPosition((INIT_OFFSET + (float)tubesNumber * TUBES_OFFSET), (float)randomHeight);
 
 		topTube = bottomTube;
 		topTube.rotate(180);
-		topTube.setTexture(&background.tubeTextureTop);
+		topTube.setTexture(&tubeTextureTop);
 		topTube.setPosition(bottomTube.getPosition().x, bottomTube.getPosition().y - TUBE_GAP);
 
-		background.tubes.push_back(bottomTube);
-		background.tubes.push_back(topTube);
+		tubes.push_back(bottomTube);
+		tubes.push_back(topTube);
 	}
 
-	return true;
+	for (size_t status = 0; status < TUBES_COUNT / 2; status++)
+	{
+		tubesStatuses.push_back(false);
+	}
 }
 
-void drawGround(sf::RenderWindow &window, std::vector<sf::RectangleShape> const& grounds)
+void Background::Update(float elapsedTime)
 {
-	for (auto ground : grounds)
-		window.draw(ground);
+	UpdateGround(elapsedTime);
+	UpdateTubes(elapsedTime);
 }
 
-void moveGround(float &elapsedTime, std::vector<sf::RectangleShape>& grounds)
+void Background::UpdateGround(float elapsedTime)
 {
 	const float movement = -SPEED * elapsedTime;
 
@@ -125,22 +116,14 @@ void moveGround(float &elapsedTime, std::vector<sf::RectangleShape>& grounds)
 	}
 }
 
-void drawTubes(sf::RenderWindow& window, Background& background)
-{
-	for (auto tube : background.tubes)
-	{
-		window.draw(tube);
-	}
-}
-
-void moveTubes(float& elapsedTime, Background& background)
+void Background::UpdateTubes(float elapsedTime)
 {
 	const float movement = -SPEED * elapsedTime;
 
 	for (size_t tube = 0; tube < TUBES_COUNT; tube += 2)
 	{
-		sf::RectangleShape bottomTube = background.tubes[tube];
-		sf::RectangleShape topTube = background.tubes[tube + 1];
+		sf::RectangleShape bottomTube = tubes[tube];
+		sf::RectangleShape topTube = tubes[tube + 1];
 
 		if (bottomTube.getPosition().x + TUBE_SIZE.x / 2.0f <= 0)
 		{
@@ -149,13 +132,22 @@ void moveTubes(float& elapsedTime, Background& background)
 			bottomTube.setPosition(bottomTube.getPosition().x + (TUBES_OFFSET * (float)TUBES_COUNT / 2.0f), (float)randomHeight);
 			topTube.setPosition(bottomTube.getPosition().x, bottomTube.getPosition().y - TUBE_GAP);
 
-			background.tubes[tube].setPosition(bottomTube.getPosition());
-			background.tubes[tube + 1].setPosition(topTube.getPosition());
+			tubes[tube].setPosition(bottomTube.getPosition());
+			tubes[tube + 1].setPosition(topTube.getPosition());
 
-			if (tube % 2 ==0)
-				background.tubesStatuses[tube] = false;
+			if (tube % 2 == 0)
+				tubesStatuses[tube / 2] = false;
 		}
-		background.tubes[tube].move(movement, 0);
-		background.tubes[tube + 1].move(movement, 0);
+		tubes[tube].move(movement, 0);
+		tubes[tube + 1].move(movement, 0);
 	}
+}
+
+void Background::Draw(sf::RenderWindow& window)
+{
+	for (auto tube : tubes)
+		window.draw(tube);
+
+	for (auto ground : grounds)
+		window.draw(ground);
 }
