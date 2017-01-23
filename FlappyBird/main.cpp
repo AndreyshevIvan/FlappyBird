@@ -37,7 +37,7 @@ void EnterGameLoop(Game& game, sf::RenderWindow& window)
 		game.CalculateTime();
 
 		HandleEvents(game, window);
-		game.m_currentScene->onUpdate();
+		Update(game);
 		Render(game, window);
 	}
 }
@@ -65,8 +65,8 @@ void Render(Game &system, sf::RenderWindow &window)
 	window.clear(SKY_COLOR);
 	window.draw(system.background.wrapper);
 	drawTubes(window, system.background);
-	drawGround(window, system.background.ground);
-	window.draw(system.bird.body);
+	drawGround(window, system.background.grounds);
+	window.draw(system.bird.m_body);
 
 	system.m_currentScene->onDraw(window);
 
@@ -108,16 +108,11 @@ void InitGameplayScene(Game& game)
 {
 	game.m_gameplayScene.onUpdate = [&]() {
 		flappingAnimate(game.bird, game.m_elapsedTime);
-		moveGround(game.m_elapsedTime, game.background.ground);
+		moveGround(game.m_elapsedTime, game.background.grounds);
 		birdJump(game.m_elapsedTime, game.bird);
 		moveTubes(game.m_elapsedTime, game.background);
-		isTubeChecked(game.bird, game.background, game.gui);
-		if (collision(game.bird, game.background))
-		{
-			game.gui.failSound.play();
-			initScore(game.gui);
-			game.m_currentScene = &game.m_finishScene;
-		}
+		game.CheckTubeComplete();
+		game.CheckBirdCollide();
 	};
 
 	game.m_gameplayScene.onDraw = [&](sf::RenderWindow &window) {

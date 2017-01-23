@@ -28,17 +28,9 @@ struct Game
 
 	void Init();
 	void CalculateTime();
+
+	bool IsBirdCollide();
+	void CheckBirdCollide();
+
+	void CheckTubeComplete();
 };
-
-void Game::Init()
-{
-	bird.Init();
-	background.Init();
-	gui.Init();
-}
-
-void Game::CalculateTime()
-{
-	m_elapsedTime = clock.getElapsedTime().asSeconds();
-	clock.restart();
-}

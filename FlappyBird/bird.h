@@ -9,18 +9,16 @@ struct Bird
 
 	std::vector<float> jumpingVector; // {time, past height}
 
-	sf::RectangleShape body;
-	sf::Texture bodyTexture;
-	sf::CircleShape collisionShape;
+	sf::RectangleShape m_body;
+	sf::Texture m_bodyTexture;
+	sf::CircleShape m_collisionShape;
 
-	float flappingAnimTime;
-	float idleAnimTime;
+	float m_flappingAnimTime;
+	float m_idleAnimTime;
 
 	void Init();
 };
 
-void isTubeChecked(Bird &bird, Background &background, Interface &gui);
-bool collision(Bird &bird, Background background);
 void startJump(Bird &bird, Interface &gui);
 void birdJump(const float &elapsedTime, Bird &bird);
 void flappingAnimate(Bird &bird, const float &elapsedTime);
