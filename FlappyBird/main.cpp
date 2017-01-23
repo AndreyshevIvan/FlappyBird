@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "game.h"
 
-static const int RESOLUTION_W = 480;
-static const int RESOLUTION_H = 640;
+static const sf::Vector2i RESOLUTION = { 480, 640 };
 static const std::string GAME_NAME = "FlappyBird";
 
 void InitScenes(Game& game);
@@ -17,7 +16,7 @@ void HandleEvents(Game& game, sf::RenderWindow& window);
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), GAME_NAME, sf::Style::Titlebar + sf::Style::Close);
+	sf::RenderWindow window(sf::VideoMode(RESOLUTION.x, RESOLUTION.y), GAME_NAME, sf::Style::Titlebar + sf::Style::Close);
 	window.setKeyRepeatEnabled(false);
 
 	Game flappyBird;

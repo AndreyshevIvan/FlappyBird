@@ -127,9 +127,9 @@ void Background::UpdateTubes(float elapsedTime)
 
 		if (bottomTube.getPosition().x + TUBE_SIZE.x / 2.0f <= 0)
 		{
-			int randomHeight = rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT) + MIN_TUBE_HEIGHT;
+			float randomHeight = static_cast<float>(rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT) + MIN_TUBE_HEIGHT);
 
-			bottomTube.setPosition(bottomTube.getPosition().x + (TUBES_OFFSET * (float)TUBES_COUNT / 2.0f), (float)randomHeight);
+			bottomTube.setPosition(bottomTube.getPosition().x + (TUBES_OFFSET * (float)TUBES_COUNT / 2.0f), randomHeight);
 			topTube.setPosition(bottomTube.getPosition().x, bottomTube.getPosition().y - TUBE_GAP);
 
 			tubes[tube].setPosition(bottomTube.getPosition());
