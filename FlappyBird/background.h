@@ -7,6 +7,8 @@ static const int TUBES_COUNT = 3;
 
 struct Background
 {
+	Background();
+
 	sf::RectangleShape ground[GROUNDS_COUNT];
 	sf::RectangleShape tubes[TUBES_COUNT][2];
 	sf::RectangleShape wrapper;
@@ -15,13 +17,14 @@ struct Background
 	sf::Texture tubeTextureBottom;
 	sf::Texture tubeTextureTop;
 	bool tubeStatus[TUBES_COUNT];
+
+	void Init();
 };
 
-bool initBackground(Background &background);
-bool inititalizeWrapper(Background &background);
-bool inititalizeGround(Background &background);
+bool initWrapper(Background &background);
+bool initGround(Background &background);
 void moveGround(float &elapsedTime, sf::RectangleShape ground[]);
 void drawGround(sf::RenderWindow &window, sf::RectangleShape ground[]);
-bool inititalizeTubes(Background &background);
+bool initTubes(Background &background);
 void moveTubes(float &elapsedTIme, Background &background);
 void drawTubes(sf::RenderWindow &window, Background &background);

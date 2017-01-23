@@ -33,6 +33,24 @@ static const float OSCILLATION_AMPLITUDE = 0.12f;
 
 static const int POINTS_TO_WIN = 1000;
 
+
+Interface::Interface()
+{
+	Init();
+}
+
+void Interface::Init()
+{
+	loadGuiFiles(*this);
+	initPoints(*this);
+	initStatistic(*this);
+	initPressR(*this);
+	initGuide(*this);
+	initGameName(*this);
+	initGameOver(*this);
+	initSound(*this);
+}
+
 bool loadGuiFiles(Interface &gui)
 {
 	if (!gui.pointsFont.loadFromFile("resources/FlappyBird.otf"))
@@ -75,7 +93,7 @@ void initScore(Interface &gui)
 	gui.score.setOutlineColor(FONT_OUTLINE_COLOR);
 	gui.score.setOutlineThickness((float)FONT_OUTLINE_THICKNESS_2);
 	gui.score.setFillColor(FONT_COLOR);
-	gui.score.setString(toString(gui.pointsCount));
+	gui.score.setString(std::to_string(gui.pointsCount));
 	gui.score.setOrigin(gui.score.getGlobalBounds().width, 0);
 	gui.score.setPosition(SCORE_POS);
 }
@@ -125,22 +143,6 @@ void initGameOver(Interface &gui)
 	gui.gameOver.setTexture(&gui.gameOverTexture);
 }
 
-bool initInterface(Interface &gui)
-{
-	if (!loadGuiFiles(gui))
-		return false;
-
-	initPoints(gui);
-	initStatistic(gui);
-	initPressR(gui);
-	initGuide(gui);
-	initGameName(gui);
-	initGameOver(gui);
-	initSound(gui);
-
-	return true;
-}
-
 void addPoint(Interface &gui)
 {
 	gui.pointsCount += 1;
@@ -148,7 +150,7 @@ void addPoint(Interface &gui)
 	if (gui.pointsCount >= POINTS_TO_WIN)
 		exit(1);
 
-	gui.points.setString(toString(gui.pointsCount));
+	gui.points.setString(std::to_string(gui.pointsCount));
 	gui.points.setOrigin(gui.points.getGlobalBounds().width / 2.0f, 0);
 	gui.points.setPosition(POINTS_POS);
 }

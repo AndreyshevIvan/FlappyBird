@@ -1,10 +1,10 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <sstream>
+#include "stdafx.h"
 
 struct Interface
 {
+	Interface();
+
 	sf::Font pointsFont;
 	sf::Text points;
 	sf::Text score;
@@ -23,17 +23,10 @@ struct Interface
 	sf::Texture gameOverTexture;
 	int pointsCount;
 	float guideTimer;
+
+	void Init();
 };
 
-template <typename T>
-std::string toString(T val)
-{
-	std::ostringstream oss;
-	oss << val;
-	return oss.str();
-}
-
-bool initInterface(Interface &gui);
 bool loadGuiFiles(Interface &gui);
 void initPoints(Interface &gui);
 void initScore(Interface &gui);

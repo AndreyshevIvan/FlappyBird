@@ -1,158 +1,155 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include "bird.h"
-#include "background.h"
-#include "interface.h"
-#include <cassert>
-#include <functional>
-#include <iostream>
+#include "stdafx.h"
+#include "game.h"
 
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
+static const std::string GAME_NAME = "Flappy Bird";
 
-struct GameBehavior
+void InitScenes(Game& game);
+void InitStartScene(Game &system);
+void InitGameplayScene(Game& game);
+void IninFinishScene(Game& game);
+
+void EnterGameLoop(Game& game, sf::RenderWindow& window);
+void Render(Game& game, sf::RenderWindow& window);
+void Update(Game& game);
+void HandleEvents(Game& game, sf::RenderWindow& window);
+
+int main()
 {
-	std::function<void(float dt)> onUpdate;
-	std::function<void(sf::RenderWindow &window)> onDraw;
-};
+	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), GAME_NAME, sf::Style::Titlebar + sf::Style::Close);
+	window.setKeyRepeatEnabled(false);
 
-struct GameSystem
+	Game flappyBird;
+	flappyBird.Init();
+
+	InitScenes(flappyBird);
+
+	EnterGameLoop(flappyBird, window);
+
+	return 0;
+}
+
+void EnterGameLoop(Game& game, sf::RenderWindow& window)
 {
-	Bird bird;
-	Background background;
-	Interface gui;
-	sf::Clock clock;
-	GameBehavior m_startBehavior;
-	GameBehavior m_gameplayBehavior;
-	GameBehavior m_pauseBehavior;
-	GameBehavior *m_currentBehavior = nullptr;
-};
-
-void initGameStructs(Bird &bird, Background &background, Interface &gui)
-{
-	bool inited = initBird(bird)
-		&& initBackground(background)
-		&& initInterface(gui);
-
-	if (!inited)
+	while (window.isOpen())
 	{
-		assert(false);
-		exit(1);
+		game.CalculateTime();
+
+		HandleEvents(game, window);
+		game.m_currentScene->onUpdate();
+		Render(game, window);
 	}
 }
 
-void initStartBehavior(GameSystem &system)
-{
-	system.m_startBehavior.onUpdate = [&](float elapsedTime) {
-		flappingAnimate(system.bird, elapsedTime);
-		stayingAnimate(system.bird, elapsedTime);
-		stayingInterfaceAnimate(elapsedTime, system.gui);
-	};
-	system.m_startBehavior.onDraw = [&](sf::RenderWindow &window) {
-		window.draw(system.gui.gameName);
-		window.draw(system.gui.guide);
-	};
-}
-
-void initGameplayBehavior(GameSystem &system)
-{
-	system.m_gameplayBehavior.onUpdate = [&](float elapsedTime) {
-		flappingAnimate(system.bird, elapsedTime);
-		moveGround(elapsedTime, system.background.ground);
-		birdJump(elapsedTime, system.bird);
-		moveTubes(elapsedTime, system.background);
-		isTubeChecked(system.bird, system.background, system.gui);
-		if (collision(system.bird, system.background))
-		{
-			system.gui.failSound.play();
-			initScore(system.gui);
-			system.m_currentBehavior = &system.m_pauseBehavior;
-		}
-	};
-	system.m_gameplayBehavior.onDraw = [&](sf::RenderWindow &window) {
-		window.draw(system.gui.points);
-	};
-}
-
-void initPauseBehavior(GameSystem &system)
-{
-	system.m_pauseBehavior.onUpdate = [&](float elapsedTime) {
-	};
-	system.m_pauseBehavior.onDraw = [&](sf::RenderWindow &window) {
-		window.draw(system.gui.statistic);
-		window.draw(system.gui.score);
-		window.draw(system.gui.gameOver);
-		window.draw(system.gui.pressR);
-	};
-}
-
-void initGameSystem(GameSystem &system)
-{
-	initGameStructs(system.bird, system.background, system.gui);
-	initStartBehavior(system);
-	initGameplayBehavior(system);
-	initPauseBehavior(system);
-
-	system.m_currentBehavior = &system.m_startBehavior;
-}
-
-void handleEvents(GameSystem &system, sf::RenderWindow &window)
+void HandleEvents(Game& game, sf::RenderWindow& window)
 {
 	sf::Event event;
 	while (window.pollEvent(event))
 	{
-		if (event.type == sf::Event::Closed)
+		if ((event.type == sf::Event::Closed) ||
+			(event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape))
 			window.close();
 
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space && system.m_currentBehavior != &system.m_pauseBehavior)
-		{
-			startJump(system.bird, system.gui);
-			system.m_currentBehavior = &system.m_gameplayBehavior;
-		}
-
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R && system.m_currentBehavior == &system.m_pauseBehavior)
-		{
-			system.m_currentBehavior = &system.m_startBehavior;
-			initGameSystem(system);
-		}
+		game.m_currentScene->toHandle(event);
 	}
 }
 
-void render(GameSystem &system, sf::RenderWindow &window)
+void Update(Game& game)
+{
+	game.m_currentScene->onUpdate();
+}
+
+void Render(Game &system, sf::RenderWindow &window)
 {
 	window.clear(SKY_COLOR);
 	window.draw(system.background.wrapper);
 	drawTubes(window, system.background);
 	drawGround(window, system.background.ground);
-	window.draw(system.bird.shape);
+	window.draw(system.bird.body);
 
-	system.m_currentBehavior->onDraw(window);
+	system.m_currentScene->onDraw(window);
 
 	window.display();
 }
 
-void enterGameLoop(GameSystem &flappyBird, sf::RenderWindow &window)
+void InitScenes(Game& game)
 {
-	while (window.isOpen())
-	{
-		const float elapsedTime = flappyBird.clock.getElapsedTime().asSeconds();
-		flappyBird.clock.restart();
+	InitStartScene(game);
+	InitGameplayScene(game);
+	IninFinishScene(game);
 
-		handleEvents(flappyBird, window);
-		flappyBird.m_currentBehavior->onUpdate(elapsedTime);
-		render(flappyBird, window);
-	}
+	game.m_currentScene = &game.m_startScene;
 }
 
-int main()
+void InitStartScene(Game& game)
 {
-	sf::RenderWindow window(sf::VideoMode(RESOLUTION_W, RESOLUTION_H), "Flappy Bird", sf::Style::Titlebar + sf::Style::Close);
-	window.setKeyRepeatEnabled(false);
+	game.m_startScene.onUpdate = [&]() {
+		flappingAnimate(game.bird, game.m_elapsedTime);
+		stayingAnimate(game.bird, game.m_elapsedTime);
+		stayingInterfaceAnimate(game.m_elapsedTime, game.gui);
+	};
 
-	GameSystem flappyBird;
-	initGameSystem(flappyBird);
+	game.m_startScene.onDraw = [&](sf::RenderWindow &window) {
+		window.draw(game.gui.gameName);
+		window.draw(game.gui.guide);
+	};
 
-	enterGameLoop(flappyBird, window);
+	game.m_startScene.toHandle = [&](sf::Event &event) {
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+		{
+			startJump(game.bird, game.gui);
+			game.m_currentScene = &game.m_gameplayScene;
+		}
+	};
+}
 
-	return 0;
+void InitGameplayScene(Game& game)
+{
+	game.m_gameplayScene.onUpdate = [&]() {
+		flappingAnimate(game.bird, game.m_elapsedTime);
+		moveGround(game.m_elapsedTime, game.background.ground);
+		birdJump(game.m_elapsedTime, game.bird);
+		moveTubes(game.m_elapsedTime, game.background);
+		isTubeChecked(game.bird, game.background, game.gui);
+		if (collision(game.bird, game.background))
+		{
+			game.gui.failSound.play();
+			initScore(game.gui);
+			game.m_currentScene = &game.m_finishScene;
+		}
+	};
+
+	game.m_gameplayScene.onDraw = [&](sf::RenderWindow &window) {
+		window.draw(game.gui.points);
+	};
+
+	game.m_gameplayScene.toHandle = [&](sf::Event & event) {
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+		{
+			startJump(game.bird, game.gui);
+			game.m_currentScene = &game.m_gameplayScene;
+		}
+	};
+}
+
+void IninFinishScene(Game& game)
+{
+	game.m_finishScene.onUpdate = [&]() {
+	};
+
+	game.m_finishScene.onDraw = [&](sf::RenderWindow &window) {
+		window.draw(game.gui.statistic);
+		window.draw(game.gui.score);
+		window.draw(game.gui.gameOver);
+		window.draw(game.gui.pressR);
+	};
+
+	game.m_finishScene.toHandle = [&](sf::Event &event) {
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
+		{
+			game.m_currentScene = &game.m_startScene;
+			game.Init();
+		}
+	};
 }

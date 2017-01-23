@@ -22,37 +22,28 @@ static const float DOWN_ROT_SPEED = 280;
 static const float FLAPPING_SPEED = 15;
 static const float OSCILLATION_AMPLITUDE = 0.12f;
 
-bool initBody(Bird &bird)
+Bird::Bird()
 {
-	bird.shape.setSize(BIRD_SIZE);
-	if (!bird.shapeTexture.loadFromFile("resources/mainHero.png"))
-		return false;
-	bird.shape.setTexture(&bird.shapeTexture);
-	bird.shape.setTextureRect(sf::IntRect(40, 0, 40, 28));
-	bird.shape.setRotation(0);
-	bird.shape.setOrigin(BIRD_SIZE.x / 2.0f, BIRD_SIZE.y / 2.0f);
-	bird.shape.setPosition(BIRD_POSITION);
+	bodyTexture.loadFromFile("resources/mainHero.png");
 
-	return true;
+	body.setSize(BIRD_SIZE);
+	body.setTexture(&bodyTexture);
+	body.setTextureRect(sf::IntRect(40, 0, 40, 28));
+	body.setOrigin(BIRD_SIZE.x / 2.0f, BIRD_SIZE.y / 2.0f);
+
+	collisionShape.setRadius(COLLISION_SHAPE_RADIUS);
+	collisionShape.setOrigin(COLLISION_SHAPE_RADIUS, COLLISION_SHAPE_RADIUS);
 }
 
-void initCollisionShape(Bird &bird)
+void Bird::Init()
 {
-	bird.collisionShape.setRadius(COLLISION_SHAPE_RADIUS);
-	bird.collisionShape.setOrigin(COLLISION_SHAPE_RADIUS, COLLISION_SHAPE_RADIUS);
-	bird.collisionShape.setPosition(BIRD_POSITION);
-}
+	body.setPosition(BIRD_POSITION);
+	body.setRotation(0);
+	collisionShape.setPosition(BIRD_POSITION);
 
-bool initBird(Bird &bird)
-{
-	if (!initBody(bird))
-		return false;
-	initCollisionShape(bird);
-	bird.jumpingVector = { 0, 0 }; // {time, past height}
-	bird.animTime[0] = 0;
-	bird.animTime[1] = 0;
-
-	return true;
+	jumpingVector = { 0, 0 }; // {time, past height}
+	flappingAnimTime = 0;
+	idleAnimTime = 0;
 }
 
 bool collision(Bird &bird, Background background)
@@ -73,7 +64,7 @@ bool collision(Bird &bird, Background background)
 void isTubeChecked(Bird &bird, Background &background, Interface &gui)
 {
 	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
-		if (background.tubes[tubeNumber][0].getPosition().x <= bird.shape.getPosition().x && !background.tubeStatus[tubeNumber])
+		if (background.tubes[tubeNumber][0].getPosition().x <= bird.body.getPosition().x && !background.tubeStatus[tubeNumber])
 		{
 			background.tubeStatus[tubeNumber] = true;
 			addPoint(gui);
@@ -82,20 +73,20 @@ void isTubeChecked(Bird &bird, Background &background, Interface &gui)
 
 void flappingAnimate(Bird &bird, const float &elapsedTime)
 {
-	bird.animTime[0] += FLAPPING_SPEED * elapsedTime;
-	if ((int)bird.animTime[0] > 2)
-		bird.animTime[0] = 0;
-	bird.shape.setTextureRect(sf::IntRect((int)bird.animTime[0] * 34, 0, 34, 24));
+	bird.flappingAnimTime += FLAPPING_SPEED * elapsedTime;
+	if ((int)bird.flappingAnimTime > 2)
+		bird.flappingAnimTime = 0;
+	bird.body.setTextureRect(sf::IntRect((int)bird.flappingAnimTime * 34, 0, 34, 24));
 }
 
 void stayingAnimate(Bird &bird, const float &elapsedTime)
 {
 	const float PI = float(M_PI);
 
-	bird.animTime[1] += 1 * elapsedTime;
-	if (bird.animTime[1] >= 2 * PI)
-		bird.animTime[1] = 0;
-	bird.shape.move(0, OSCILLATION_AMPLITUDE * sin(FLAPPING_SPEED * bird.animTime[1]));
+	bird.idleAnimTime += 1 * elapsedTime;
+	if (bird.idleAnimTime >= 2 * PI)
+		bird.idleAnimTime = 0;
+	bird.body.move(0, OSCILLATION_AMPLITUDE * sin(FLAPPING_SPEED * bird.idleAnimTime));
 }
 
 void startJump(Bird &bird, Interface &gui)
@@ -114,18 +105,18 @@ void birdJump(const float &elapsedTime, Bird &bird)
 	bird.jumpingVector[1] = height = JUMP_SPEED * time - 0.5f * G * pow(time, 2.0f);
 	movement = pastHeight - height;
 
-	if (bird.shape.getPosition().y < ROOF)
-		bird.shape.setPosition(BIRD_POSITION.x, ROOF);
+	if (bird.body.getPosition().y < ROOF)
+		bird.body.setPosition(BIRD_POSITION.x, ROOF);
 
 	if (movement < 0)
-		bird.shape.setRotation(UP_ROT_ANGALE);
-	else if (bird.shape.getRotation() != DOWN_ROT_ANGLE)
+		bird.body.setRotation(UP_ROT_ANGALE);
+	else if (bird.body.getRotation() != DOWN_ROT_ANGLE)
 	{
-		bird.shape.rotate(DOWN_ROT_SPEED * elapsedTime);
-		if (bird.shape.getRotation() < 360 + UP_ROT_ANGALE && bird.shape.getRotation() > DOWN_ROT_ANGLE)
-			bird.shape.setRotation(DOWN_ROT_ANGLE);
+		bird.body.rotate(DOWN_ROT_SPEED * elapsedTime);
+		if (bird.body.getRotation() < 360 + UP_ROT_ANGALE && bird.body.getRotation() > DOWN_ROT_ANGLE)
+			bird.body.setRotation(DOWN_ROT_ANGLE);
 	}
 
-	bird.shape.move(0, IMPULSE * movement);
-	bird.collisionShape.setPosition(bird.shape.getPosition());
+	bird.body.move(0, IMPULSE * movement);
+	bird.collisionShape.setPosition(bird.body.getPosition());
 }

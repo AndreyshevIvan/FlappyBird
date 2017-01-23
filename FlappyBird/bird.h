@@ -1,20 +1,24 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include "stdafx.h"
 #include "interface.h"
 #include "background.h"
 
 struct Bird
 {
+	Bird();
+
 	std::vector<float> jumpingVector; // {time, past height}
-	sf::RectangleShape shape;
+
+	sf::RectangleShape body;
+	sf::Texture bodyTexture;
 	sf::CircleShape collisionShape;
-	sf::Texture shapeTexture;
-	float animTime[2];
+
+	float flappingAnimTime;
+	float idleAnimTime;
+
+	void Init();
 };
 
-bool initBird(Bird &bird);
-bool initBody(Bird &bird);
-void initCollisionShape(Bird &bird);
 void isTubeChecked(Bird &bird, Background &background, Interface &gui);
 bool collision(Bird &bird, Background background);
 void startJump(Bird &bird, Interface &gui);

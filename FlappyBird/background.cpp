@@ -26,7 +26,22 @@ static const int MAX_TUBE_HEIGHT = (int)(RESOLUTION_H - GROUND_SIZE.y - VERTICAL
 
 const float SPEED = 250.f; // pixels per second.
 
-bool inititalizeWrapper(Background &background)
+
+Background::Background()
+{
+	Init();
+}
+
+void Background::Init()
+{
+	initWrapper(*this);
+	initGround(*this);
+	initTubes(*this);
+	for (auto tube = 0; tube < TUBES_COUNT; tube++)
+		tubeStatus[tube] = false;
+}
+
+bool initWrapper(Background &background)
 {
 	if (!background.wrapperTexture.loadFromFile("resources/wrapper.png"))
 		return false;
@@ -37,7 +52,7 @@ bool inititalizeWrapper(Background &background)
 	return true;
 }
 
-bool inititalizeGround(Background &background)
+bool initGround(Background &background)
 {
 	srand((unsigned)time(NULL));
 
@@ -53,7 +68,7 @@ bool inititalizeGround(Background &background)
 	return true;
 }
 
-bool inititalizeTubes(Background &background)
+bool initTubes(Background &background)
 {
 	if (!background.tubeTextureBottom.loadFromFile("resources/tubeBottom.png"))
 		return false;
@@ -79,16 +94,6 @@ bool inititalizeTubes(Background &background)
 		background.tubes[tubesNumber][0] = bottomTube;
 		background.tubes[tubesNumber][1] = topTube;
 	}
-
-	return true;
-}
-
-bool initBackground(Background &background)
-{
-	if (!inititalizeWrapper(background) || !inititalizeGround(background) || !inititalizeTubes(background))
-		return false;
-	for (int tubeNumber = 0; tubeNumber < TUBES_COUNT; tubeNumber++)
-		background.tubeStatus[tubeNumber] = false;
 
 	return true;
 }
