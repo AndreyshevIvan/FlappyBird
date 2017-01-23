@@ -1,8 +1,6 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include "stdafx.h"
 #include "background.h"
-#include "interface.h"
-#include "bird.h"
 
 static const float RESOLUTION_W = 480;
 static const float RESOLUTION_H = 640;
@@ -105,12 +103,14 @@ void Background::UpdateGround(float elapsedTime)
 {
 	const float movement = -SPEED * elapsedTime;
 
-	for (auto ground : grounds)
+	for (auto& ground : grounds)
 	{
 		const sf::Vector2f position = ground.getPosition();
 
 		if (position.x + GROUND_SIZE.x <= 0)
+		{
 			ground.setPosition(GROUND_OFFSET * GROUNDS_COUNT + position.x, position.y);
+		}
 
 		ground.move(movement, 0);
 	}

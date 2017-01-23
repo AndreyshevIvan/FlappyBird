@@ -14,7 +14,7 @@ void Game::CalculateTime()
 	clock.restart();
 }
 
-bool Game::IsBirdCollide()
+bool Game::IsBirdFell()
 {
 	auto birdBody = bird.m_collisionShape.getGlobalBounds();
 
@@ -31,10 +31,9 @@ bool Game::IsBirdCollide()
 
 void Game::CheckBirdCollide()
 {
-	if (IsBirdCollide())
+	if (IsBirdFell())
 	{
-		gui.failSound.play();
-		initScore(gui);
+		sound.Fail();
 		m_currentScene = &m_finishScene;
 	}
 }
@@ -49,7 +48,8 @@ void Game::CheckTubeComplete()
 		if (tubePos <= birdPos && !background.tubesStatuses[tube / 2])
 		{
 			background.tubesStatuses[tube / 2] = true;
-			addPoint(gui);
+			sound.Point();
+			gui.AddPoint();
 		}
 	}
 }

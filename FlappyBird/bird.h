@@ -1,7 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include "interface.h"
-#include "background.h"
 
 enum struct BirdStatus
 {
@@ -15,7 +13,7 @@ struct Bird
 
 	BirdStatus status;
 
-	std::vector<float> jumpingVector; // {time, past height}
+	float jumpSpeed;
 
 	sf::RectangleShape m_body;
 	sf::Texture m_bodyTexture;
@@ -33,6 +31,7 @@ struct Bird
 
 	void Update(float elapsedTime);
 	void UpdateGravity(float elapsedTime);
+	void RotateBody(float elapsedTime, float movement);
 
 	void Draw(sf::RenderWindow& window);
 };

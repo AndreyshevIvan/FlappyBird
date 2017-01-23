@@ -3,7 +3,7 @@
 
 static const int RESOLUTION_W = 480;
 static const int RESOLUTION_H = 640;
-static const std::string GAME_NAME = "Flappy Bird";
+static const std::string GAME_NAME = "FlappyBird";
 
 void InitScenes(Game& game);
 void InitStartScene(Game& system);
@@ -80,21 +80,20 @@ void InitStartScene(Game& game)
 {
 	game.m_startScene.onUpdate = [&]() {
 		game.bird.Update(game.m_elapsedTime);
-		stayingInterfaceAnimate(game.m_elapsedTime, game.gui);
+		game.gui.Update(START, game.m_elapsedTime);
 	};
 
 	game.m_startScene.onDraw = [&](sf::RenderWindow &window) {
 		game.background.Draw(window);
 		game.bird.Draw(window);
-		window.draw(game.gui.gameName);
-		window.draw(game.gui.guide);
+		game.gui.Draw(START, window);
 	};
 
 	game.m_startScene.toHandle = [&](sf::Event &event) {
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 		{
 			game.bird.Jump();
-			game.gui.wingSound.play();
+			game.sound.Wing();
 			game.m_currentScene = &game.m_gameplayScene;
 		}
 	};
@@ -103,6 +102,7 @@ void InitStartScene(Game& game)
 void InitGameplayScene(Game& game)
 {
 	game.m_gameplayScene.onUpdate = [&]() {
+		game.gui.Update(GAMEPLAY, game.m_elapsedTime);
 		game.background.Update(game.m_elapsedTime);
 		game.bird.Update(game.m_elapsedTime);
 		game.CheckTubeComplete();
@@ -112,14 +112,14 @@ void InitGameplayScene(Game& game)
 	game.m_gameplayScene.onDraw = [&](sf::RenderWindow &window) {
 		game.background.Draw(window);
 		game.bird.Draw(window);
-		window.draw(game.gui.points);
+		game.gui.Draw(GAMEPLAY, window);
 	};
 
 	game.m_gameplayScene.toHandle = [&](sf::Event & event) {
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 		{
 			game.bird.Jump();
-			game.gui.wingSound.play();
+			game.sound.Wing();
 			game.m_currentScene = &game.m_gameplayScene;
 		}
 	};
@@ -133,10 +133,7 @@ void IninFinishScene(Game& game)
 	game.m_finishScene.onDraw = [&](sf::RenderWindow &window) {
 		game.background.Draw(window);
 		game.bird.Draw(window);
-		window.draw(game.gui.statistic);
-		window.draw(game.gui.score);
-		window.draw(game.gui.gameOver);
-		window.draw(game.gui.pressR);
+		game.gui.Draw(GAMEOVER, window);
 	};
 
 	game.m_finishScene.toHandle = [&](sf::Event &event) {

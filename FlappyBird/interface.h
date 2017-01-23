@@ -1,40 +1,52 @@
 #pragma once
 #include "stdafx.h"
 
+enum
+{
+	// Scenes
+	START,
+	GAMEPLAY,
+	GAMEOVER,
+};
+
 struct Interface
 {
 	Interface();
 
-	sf::Font pointsFont;
-	sf::Text points;
-	sf::Text score;
-	sf::Text pressR;
-	sf::Music pointSound;
-	sf::Music wingSound;
-	sf::Music failSound;
-	sf::Music tenPointsSound;
-	sf::RectangleShape statistic;
-	sf::RectangleShape guide;
-	sf::RectangleShape gameName;
-	sf::RectangleShape gameOver;
-	sf::Texture statisticTexture;
-	sf::Texture guideTexture;
-	sf::Texture gameNameTexture;
-	sf::Texture gameOverTexture;
-	int pointsCount;
-	float guideTimer;
+	sf::Font m_pointsFont;
+
+	sf::Text m_points;
+	sf::Text m_score;
+	sf::Text m_helpText;
+
+	sf::RectangleShape m_statisticPanel;
+	sf::RectangleShape m_guide;
+	sf::RectangleShape m_gameName;
+	sf::RectangleShape m_gameOver;
+
+	sf::Texture m_statisticPanelTexture;
+	sf::Texture m_guideTexture;
+	sf::Texture m_gameNameTexture;
+	sf::Texture m_gameOverTexture;
+
+	int m_pointsCount;
+	float m_guideTimer;
+
+	void LoadFiles();
 
 	void Init();
-};
+	void InitPoints();
+	void InitGameNamePanel();
+	void InitStatisticPanel();
+	void InitScore();
+	void InitHelpText();
+	void InitGuidePanel();
+	void InitGameOverPanel();
 
-bool loadGuiFiles(Interface &gui);
-void initPoints(Interface &gui);
-void initScore(Interface &gui);
-void initStatistic(Interface &gui);
-void initPressR(Interface &gui);
-void initGuide(Interface &gui);
-void initGameName(Interface &gui);
-void initGameOver(Interface &gui);
-void initSound(Interface &gui);
-void addPoint(Interface &gui);
-void stayingInterfaceAnimate(float elapsedTime, Interface &gui);
+	void AddPoint();
+
+	void Update(int scene, float elapsedTime);
+	void UpdateIdleInterface(float elapsedTime);
+
+	void Draw(int scene, sf::RenderWindow& window);
+};

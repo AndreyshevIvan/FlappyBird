@@ -4,6 +4,7 @@
 #include "bird.h"
 #include "background.h"
 #include "interface.h"
+#include "sound.h"
 
 struct GameScene
 {
@@ -20,6 +21,7 @@ struct Game
 	Bird bird;
 	Background background;
 	Interface gui;
+	FBSound sound;
 
 	GameScene m_startScene;
 	GameScene m_gameplayScene;
@@ -29,7 +31,7 @@ struct Game
 	void Init();
 	void CalculateTime();
 
-	bool IsBirdCollide();
+	bool IsBirdFell();
 	void CheckBirdCollide();
 
 	void CheckTubeComplete();
