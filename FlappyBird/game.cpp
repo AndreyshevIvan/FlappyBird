@@ -3,6 +3,8 @@
 
 void Game::Init()
 {
+	srand(static_cast<unsigned>(time(NULL)));
+
 	bird.Init();
 	background.Init();
 	gui.Init();

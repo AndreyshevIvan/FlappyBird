@@ -13,7 +13,7 @@ struct Bird
 
 	BirdStatus status;
 
-	float jumpSpeed;
+	float m_jumpSpeed;
 
 	sf::RectangleShape m_body;
 	sf::Texture m_bodyTexture;

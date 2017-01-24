@@ -27,8 +27,6 @@ const float SPEED = 250.f; // pixels per second.
 
 void Background::Init()
 {
-	srand((unsigned)time(NULL));
-
 	InitWrapper();
 	InitGround();
 	InitTubes();
@@ -66,20 +64,20 @@ void Background::InitTubes()
 	tubeTextureBottom.loadFromFile("resources/tubeBottom.png");
 	tubeTextureTop.loadFromFile("resources/tubeTop.png");
 
-	for (int tubesNumber = 0; tubesNumber < TUBES_COUNT; tubesNumber++)
+	for (int tube = 0; tube < TUBES_COUNT; tube++)
 	{
 		sf::RectangleShape bottomTube;
 		sf::RectangleShape topTube;
 
-		int randomHeight = MIN_TUBE_HEIGHT + rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT);
+		const int HEIGHT = rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT) + MIN_TUBE_HEIGHT;
 
-		bottomTube = sf::RectangleShape(TUBE_SIZE);
+		bottomTube.setSize(TUBE_SIZE);
 		bottomTube.setTexture(&tubeTextureBottom);
 		bottomTube.setOrigin(TUBE_SIZE.x / 2.0f, 0);
-		bottomTube.setPosition((INIT_OFFSET + (float)tubesNumber * TUBES_OFFSET), (float)randomHeight);
+		bottomTube.setPosition((INIT_OFFSET + (float)tube * TUBES_OFFSET), (float)HEIGHT);
 
 		topTube = bottomTube;
-		topTube.rotate(180);
+		topTube.setRotation(180);
 		topTube.setTexture(&tubeTextureTop);
 		topTube.setPosition(bottomTube.getPosition().x, bottomTube.getPosition().y - TUBE_GAP);
 
@@ -122,24 +120,24 @@ void Background::UpdateTubes(float elapsedTime)
 
 	for (size_t tube = 0; tube < TUBES_COUNT; tube += 2)
 	{
-		sf::RectangleShape bottomTube = tubes[tube];
-		sf::RectangleShape topTube = tubes[tube + 1];
+		auto bottomTube = &tubes[tube];
+		auto topTube = &tubes[tube + 1];
 
-		if (bottomTube.getPosition().x + TUBE_SIZE.x / 2.0f <= 0)
+		const float OLD_POS = bottomTube->getPosition().x;
+
+		if (OLD_POS + TUBE_SIZE.x / 2.0f <= 0)
 		{
-			float randomHeight = static_cast<float>(rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT) + MIN_TUBE_HEIGHT);
+			const float NEW_POS = OLD_POS + (TUBES_OFFSET * static_cast<float>(TUBES_COUNT) / 2.0f);
+			const auto NEW_HEIGHT = rand() % (MAX_TUBE_HEIGHT - MIN_TUBE_HEIGHT) + MIN_TUBE_HEIGHT;
 
-			bottomTube.setPosition(bottomTube.getPosition().x + (TUBES_OFFSET * (float)TUBES_COUNT / 2.0f), randomHeight);
-			topTube.setPosition(bottomTube.getPosition().x, bottomTube.getPosition().y - TUBE_GAP);
-
-			tubes[tube].setPosition(bottomTube.getPosition());
-			tubes[tube + 1].setPosition(topTube.getPosition());
+			bottomTube->setPosition(NEW_POS, static_cast<float>(NEW_HEIGHT));
+			topTube->setPosition(NEW_POS, bottomTube->getPosition().y - TUBE_GAP);
 
 			if (tube % 2 == 0)
 				tubesStatuses[tube / 2] = false;
 		}
-		tubes[tube].move(movement, 0);
-		tubes[tube + 1].move(movement, 0);
+		bottomTube->move(movement, 0);
+		topTube->move(movement, 0);
 	}
 }
 

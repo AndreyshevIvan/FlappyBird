@@ -125,11 +125,7 @@ void Interface::InitGameOverPanel()
 
 void Interface::AddPoint()
 {
-	m_pointsCount += 1;
-	if (m_pointsCount >= POINTS_TO_WIN)
-	{
-		m_pointsCount = 0;
-	}
+	m_pointsCount = (m_pointsCount < POINTS_TO_WIN) ? m_pointsCount += 1 : 0;
 }
 
 void Interface::Update(int scene, float elapsedTime)

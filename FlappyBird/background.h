@@ -1,5 +1,5 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include "stdafx.h"
 
 static const sf::Color SKY_COLOR = sf::Color(0, 153, 204);
 static const int GROUNDS_COUNT = 3;

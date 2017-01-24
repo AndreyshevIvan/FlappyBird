@@ -26,8 +26,7 @@ Bird::Bird()
 
 	m_body.setSize(BIRD_SIZE);
 	m_body.setTexture(&m_bodyTexture);
-	//m_body.setTextureRect(sf::IntRect(40, 0, 40, 28));
-	m_body.setOrigin(BIRD_SIZE.x / 2.0f, BIRD_SIZE.y / 2.0f);
+	m_body.setOrigin(BIRD_SIZE * 0.5f);
 
 	m_collisionShape.setRadius(COLLISION_SHAPE_RADIUS);
 	m_collisionShape.setOrigin(COLLISION_SHAPE_RADIUS, COLLISION_SHAPE_RADIUS);
@@ -41,7 +40,7 @@ void Bird::Init()
 	m_body.setRotation(0);
 	m_collisionShape.setPosition(BIRD_POSITION);
 
-	jumpSpeed = 0;
+	m_jumpSpeed = 0;
 	m_flappingAnimTime = 0;
 	m_idleAnimTime = 0;
 }
@@ -49,14 +48,15 @@ void Bird::Init()
 void Bird::FlappingAnimate(float elapsedTime)
 {
 	m_flappingAnimTime += FLAPPING_SPEED * elapsedTime;
+
 	if (static_cast<int>(m_flappingAnimTime) > 2)
 	{
 		m_flappingAnimTime = 0;
 	}
 
 	int frame = static_cast<int>(m_flappingAnimTime);
-	sf::IntRect texture(frame * BIRD_IMAGE_SIZE.x, 0, BIRD_IMAGE_SIZE.x, BIRD_IMAGE_SIZE.y);
-	m_body.setTextureRect(texture);
+	sf::IntRect textureArea(frame * BIRD_IMAGE_SIZE.x, 0, BIRD_IMAGE_SIZE.x, BIRD_IMAGE_SIZE.y);
+	m_body.setTextureRect(textureArea);
 }
 
 void Bird::Idle(float elapsedTime)
@@ -79,7 +79,7 @@ void Bird::Draw(sf::RenderWindow& window)
 void Bird::Jump()
 {
 	status = BirdStatus::FLAPPING;
-	jumpSpeed = -JUMP_SPEED;
+	m_jumpSpeed = -JUMP_SPEED;
 }
 
 void Bird::Update(float elapsedTime)
@@ -98,10 +98,10 @@ void Bird::Update(float elapsedTime)
 
 void Bird::UpdateGravity(float elapsedTime)
 {
-	float movement = jumpSpeed;
+	float movement = m_jumpSpeed;
 
-	jumpSpeed = jumpSpeed + G * elapsedTime;
-	movement = jumpSpeed * elapsedTime;
+	m_jumpSpeed = m_jumpSpeed + G * elapsedTime;
+	movement = m_jumpSpeed * elapsedTime;
 
 	if (m_body.getPosition().y < MAX_BIRD_HEIGHT)
 	{
@@ -123,7 +123,9 @@ void Bird::RotateBody(float elapsedTime, float movement)
 	else if (m_body.getRotation() != DOWN_ROT_ANGLE)
 	{
 		m_body.rotate(DOWN_ROT_SPEED * elapsedTime);
-		if (m_body.getRotation() < 360 + UP_ROT_ANGALE && m_body.getRotation() > DOWN_ROT_ANGLE)
+		const float bodyRotation = m_body.getRotation();
+
+		if (bodyRotation < 360 + UP_ROT_ANGALE && bodyRotation > DOWN_ROT_ANGLE)
 		{
 			m_body.setRotation(DOWN_ROT_ANGLE);
 		}
